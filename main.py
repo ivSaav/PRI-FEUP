@@ -1,13 +1,15 @@
 import pandas as pd
+from pathlib import Path
 
 def data_processing():
 
     # TODO: merge plots with imdb data
 
-    df = pd.read_csv('./data/imdb.csv')
+    in_path = Path('./data/imdb.csv')
+    df = pd.read_csv(in_path)
 
     # renaming first column
-    df = df.rename(columns= {'Unnamed: 0' : 'id'}, inplace=True)
+    df.rename(columns= {'Unnamed: 0' : 'id'}, inplace=True)
     print(f'NaN values: {df.isnull().sum().sum()} | DF size: {len(df)}')
 
     # removing rows pertaining to video games
@@ -18,7 +20,8 @@ def data_processing():
     print('[-] Removed NaN values')
     print(f'NaN values: {df.isnull().sum().sum()} | DF size: {len(df)}')
 
-    pd.to_csv('imdb_final.csv') # save final version
+    out_path = Path('./out/imdb_final.csv')
+    df.to_csv(out_path, index=False, index_label='id') # save final version
 
 
 
