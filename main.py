@@ -20,7 +20,7 @@ def data_processing():
     print('[-] Removed NaN values')
     print(f'NaN values: {df.isnull().sum().sum()} | DF size: {len(df)}')
 
-    out_path = Path('./out/imdb_final.csv')
+    out_path = Path('./data/imdb_final.csv')
     df.to_csv(out_path, index=False, index_label='id') # save final version
 
 
