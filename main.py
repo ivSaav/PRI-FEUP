@@ -1,16 +1,18 @@
 import pandas as pd
 from pathlib import Path
 
+import matplotlib.pyplot as plt
+
 def data_processing():
 
-    # TODO: merge plots with imdb data
-
-    in_path = Path('./data/imdb.csv')
-    df = pd.read_csv(in_path)
-
+    data = pd.read_csv(Path('./data/imdb.csv'))   # imdb data
     # renaming first column
-    df.rename(columns= {'Unnamed: 0' : 'id'}, inplace=True)
-    print(f'NaN values: {df.isnull().sum().sum()} | DF size: {len(df)}')
+    data.rename(columns= {'Unnamed: 0' : 'id'}, inplace=True)
+    print(f'NaN values: {data.isnull().sum().sum()} | DF size: {len(data)}')
+
+    plts = pd.read_csv(Path('./data/imdb_plots.csv')) # read imdb plots
+    # adding plots to the original data
+    df = pd.merge(data, plts, on=['id', 'title'] )
 
     # removing rows pertaining to video games
     df = df.loc[df['kind'] != 'video game']
@@ -24,6 +26,5 @@ def data_processing():
     df.to_csv(out_path, index=False, index_label='id') # save final version
 
 
-
 if __name__ == '__main__':
-    data_processing()
+    final = data_processing()
