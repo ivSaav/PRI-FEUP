@@ -10,7 +10,11 @@ def data_processing():
 
     plts = pd.read_csv(Path('./data/imdb_plots.csv')) # read imdb plots
     # adding plots to the original data
-    df = pd.merge(data, plts, on=['id', 'title'] )
+    df = pd.merge(data, plts, on=['id', 'title'])
+
+    # removing suplicate entries from dataset
+    df = df.drop_duplicates(subset=['title', 'year', 'kind', 'genre', 'rating'])
+    print('[-] Removed duplicate entries | New DF size: ', len(df))
 
     # removing rows pertaining to video games
     df = df.loc[df['kind'] != 'video game']
