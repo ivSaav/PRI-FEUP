@@ -1,8 +1,6 @@
 import pandas as pd
 from pathlib import Path
 
-import matplotlib.pyplot as plt
-
 def data_processing():
 
     data = pd.read_csv(Path('./data/imdb.csv'))   # imdb data
