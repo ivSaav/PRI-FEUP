@@ -54,6 +54,17 @@ def density_plot(df, field, xlabel, lower=None, upper=None):
     plt.savefig(out_dir / f'{field}_density')
     plt.close()
 
+def top_actors(df):
+    tmp = df.dropna(subset=['cast'])
+    tmp['cast'] = tmp['cast'].apply(eval)
+
+    print(type(tmp['cast'][0]))
+    members = to_1D(tmp['cast']).value_counts()
+
+    
+    print(members)
+    # print(to_1D(df['cast']).value_counts())
+
 
 def data_analysis():
 
@@ -70,7 +81,8 @@ def data_analysis():
     # density_plot(df, 'rating', 'Rating', lower=1, upper=10)
     # density_plot(df, 'year', 'Year', lower=1900, upper=2020)
 
-    runtime_comparison(df)
+    # runtime_comparison(df)
+    top_actors(df)
 
 
 
