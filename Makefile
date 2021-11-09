@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Signifies our desired python version
 # Makefile macros (or variables) are defined a little bit differently than traditional bash, keep in mind that in the Makefile there's top-level Makefile-only syntax, and everything else is bash script syntax.
 PYTHON = python3
@@ -21,7 +19,8 @@ help:
 
 	
 run:
-	${PYTHON} main.py
+# TODO Add analysis and brief explanation
+	${PYTHON} merge_data.py | ${PYTHON} processing.py 
 
 # In this context, the *.project pattern means "anything that has the .project extension"
 clean:

@@ -13,12 +13,13 @@ def fetch_plots(col_name='plot', m_info='plot'):
 
     print(original_df.head)
 
-    plots_dict = {'id': list(), 'title': list(), 'plot': list()}
+    plots_dict = {'id': list(), 'title': list(), m_info: list()}
 
     total = len(original_df)
     start = time()
     err_cnt = 0
     no_plt = 0
+    cnt = 0
     for _idx, row in original_df.iterrows():
         try:
             # search movie/show by title on IMDb
@@ -39,6 +40,7 @@ def fetch_plots(col_name='plot', m_info='plot'):
             if m_info in movie:
                 plots_dict[col_name].append(max(movie[m_info], key=len))  # assign smaller plot to respective movie/show
             else:
+                plots_dict[col_name].append(None)
                 print(f'[!] No {m_info} found')
                 no_plt += 1   
         except:
@@ -55,4 +57,4 @@ def fetch_plots(col_name='plot', m_info='plot'):
     print('Errors: ', err_cnt, 'Missing plots: ', no_plt)
 
 if __name__ == "__main__":
-    fetch_plots(col_name='synopsis', m_info='synopsis')
+    fetch_plots(col_name='plot', m_info='plot')
