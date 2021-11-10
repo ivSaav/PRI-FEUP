@@ -2,8 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
+import seaborn as sns
 
 out_dir = Path('./img/')
+sns.set_theme(style='darkgrid')
 
 def to_1D(series):
     # from: https://towardsdatascience.com/dealing-with-list-values-in-pandas-dataframes-a177e534f173
@@ -40,17 +42,29 @@ def top_shows(df, size, kind):
     print(s.head(size))
 
 def genre_hist(df):
-    # TODO fix size
     # turning string values into propper list values
     df['genre'] = df['genre'].apply(eval)
-    to_1D(df['genre']).value_counts().plot(kind='bar')
+    _fig, ax = plt.subplots(figsize=(12, 6))
+    genre_1D = to_1D(df['genre'])
+    genre_1D = genre_1D.to_frame(name='genre')
+    sns.countplot(data=genre_1D, y='genre', order=genre_1D['genre'].value_counts().index, palette='gist_heat')
+    ax.set_ylabel('Genre')
+    ax.set_xlabel('Count')
     plt.savefig(out_dir / 'genre_hist')
     plt.close()
 
 def density_plot(df, field, xlabel, lower=None, upper=None):
     ratings = df[field]
-    ratings.plot(kind='density', xlim=(lower, upper))
-    plt.xlabel(xlabel)
+    ax = sns.kdeplot(ratings, color='teal')
+    ax.set_xlabel(xlabel)
+    # ratings.plot(kind='density', xlim=(lower, upper))
+    # plt.xlabel(xlabel)
+    plt.savefig(out_dir / f'{field}_density')
+    plt.close()
+
+def year_hist(df, field):
+    sns.histplot(df[field], kde=True, binrange=(1920, 2021), palette='gist_heat')
+    plt.xlim(1920, 2021)
     plt.savefig(out_dir / f'{field}_density')
     plt.close()
 
@@ -61,7 +75,6 @@ def top_actors(df):
     print(type(tmp['cast'][0]))
     members = to_1D(tmp['cast']).value_counts()
 
-    
     print(members)
     # print(to_1D(df['cast']).value_counts())
 
@@ -70,7 +83,7 @@ def data_analysis():
 
     df = pd.read_csv(Path('./data/imdb_final.csv'))   # imdb data
 
-    # genre_hist(df)
+    genre_hist(df)
     
     # df['kind'].value_counts().plot.bar()
     # plt.savefig('kind_counts')
@@ -78,11 +91,12 @@ def data_analysis():
     # top 100 programs
     # top_shows(df, 25, 'movie')
 
-    # density_plot(df, 'rating', 'Rating', lower=1, upper=10)
+    density_plot(df, 'rating', 'Rating', lower=1, upper=10)
+    year_hist(df, 'year')
     # density_plot(df, 'year', 'Year', lower=1900, upper=2020)
 
     # runtime_comparison(df)
-    top_actors(df)
+    # top_actors(df)
 
 
 

@@ -17,7 +17,10 @@ def data_processing():
     print('[-] Removed entries with no plots | New DF size: ', len(df))
 
     # removing rows pertaining to video games
-    df = df.loc[df['kind'] != 'video game']
+    df = df.loc[(df['kind'] != 'video game') & (df['kind'] != 'tv short')]
+
+    # normalizing movie subtypes
+    df.loc[(df['kind'] == 'video movie') | (df['kind'] == 'tv movie'), 'kind'] = 'movie'
     
     # removing rows with NaN values
     df = df.dropna(axis=0, subset=['title', 'year', 'kind', 'genre', 'rating'])

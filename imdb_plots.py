@@ -13,7 +13,7 @@ def fetch_plots(col_name='plot', m_info='plot'):
 
     print(original_df.head)
 
-    plots_dict = {'id': list(), 'title': list(), m_info: list()}
+    plots_dict = {'id': list(), 'title': list(), 'plot': list()}
 
     total = len(original_df)
     start = time()
@@ -23,10 +23,12 @@ def fetch_plots(col_name='plot', m_info='plot'):
     for _idx, row in original_df.iterrows():
         try:
             # search movie/show by title on IMDb
-            movie_search = ia.search_movie(row['title'])
+            movie_search = ia.search_movie(f"{row['title']} ({row['year']})" )
             if (len(movie_search) <= 0):
                 no_plt += 1
                 continue
+
+            print(movie_search)
 
             movie = ia.get_movie(movie_search[0].movieID, info=m_info)
 
@@ -34,6 +36,8 @@ def fetch_plots(col_name='plot', m_info='plot'):
 
             plots_dict['id'].append(row['id'])
             plots_dict['title'].append(row['title'])
+
+            print(movie['runtime'])
 
             print("----------------------")
             print(f'[{row["id"]}/{total}] {row["title"]}')
@@ -49,8 +53,8 @@ def fetch_plots(col_name='plot', m_info='plot'):
             pass
             
 
-    plots_df = DataFrame(plots_dict)
-    plots_df.to_csv(f'imdb_{m_info}.csv', index=False)
+    # plots_df = DataFrame(plots_dict)
+    # plots_df.to_csv(f'imdb_plots.csv', index=False)
     
     diff = time() - start
     print('[!] Done - Elapsed Time: %02d:%02d' % (diff // 60, (diff % 60)))
