@@ -21,6 +21,12 @@ def data_processing():
 
     # normalizing movie subtypes
     df.loc[(df['kind'] == 'video movie') | (df['kind'] == 'tv movie'), 'kind'] = 'movie'
+
+    df['plot_size'] = df['plot'].apply(len)
+    print(df)
+
+    df = df.loc[df['plot_size'] < 4000]
+    df.drop('plot_size', axis=1, inplace=True)
     
     # removing rows with NaN values
     df = df.dropna(axis=0, subset=['title', 'year', 'kind', 'genre', 'rating'])
