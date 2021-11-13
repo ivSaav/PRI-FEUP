@@ -88,16 +88,15 @@ def top_actors(df):
     # print(members.head(50))
     # print(to_1D(df['cast']).value_counts())
 
-def word_freq(df):
-    plots = df['plot'].apply(eval)
 
 def plot_size(df):
     tmp = df[['kind', 'plot']].copy()
     tmp['length'] = df['plot'].apply(len)
+    
 
     plt.figure(figsize=(11, 8))
     # print(sorted(tmp))
-    ax = sns.boxplot(data=tmp, x='length', y='kind', palette=sns.color_palette('YlOrRd', n_colors=4), whis=3)
+    ax = sns.boxplot(data=tmp, x='length', y='kind', palette=sns.color_palette('YlOrRd', n_colors=4))
     ax.set_xlabel('Plot Length')
     ax.set_ylabel('Kind')
     plt.savefig(out_dir / 'plot_size_boxplots')
@@ -197,7 +196,7 @@ def data_analysis():
     # plt.savefig('kind_counts')
 
     # top 100 programs
-    # top_shows(df, 25, 'movie')
+    top_shows(df, 25, 'movie')
 
     # density_plot(df, 'rating', 'Rating', lower=1, upper=10)
     # year_counts(df, 'year')
@@ -205,9 +204,9 @@ def data_analysis():
 
     # runtime_comparison(df)
     # top_actors(df)
-    # plot_size(df)
+    plot_size(df)
 
-    # pie_plot(df)
+    pie_plot(df)
 
 
 
