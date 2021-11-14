@@ -11,7 +11,7 @@ def reduce_plot(lst_str):
 
 def data_processing():
 
-    sleep(1)
+    # sleep(1)
 
     df = pd.read_csv(Path('./data/imdb_final.csv'))   # imdb data
 

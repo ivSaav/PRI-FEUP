@@ -59,12 +59,12 @@ def genre_hist(df):
 
 def density_plot(df, field, xlabel, lower=None, upper=None):
     ratings = df[field]
-    ax = sns.kdeplot(ratings, color='#CC2600', bw_adjust=0.3)
+    ax = sns.histplot(ratings, color='#CC2600', bins=10)
     ax.set_xlabel(xlabel)
     # ratings.plot(kind='density', xlim=(lower, upper))
     # plt.xlabel(xlabel)
     plt.xlim(0, 10)
-    plt.savefig(out_dir / f'{field}_density')
+    plt.savefig(out_dir / f'{field}_hist')
     plt.close()
 
 def year_counts(df, field):
@@ -198,7 +198,7 @@ def data_analysis():
     # top 100 programs
     top_shows(df, 25, 'movie')
 
-    # density_plot(df, 'rating', 'Rating', lower=1, upper=10)
+    density_plot(df, 'rating', 'Rating', lower=1, upper=10)
     # year_counts(df, 'year')
     # density_plot(df, 'year', 'Year', lower=1900, upper=2020)
 
