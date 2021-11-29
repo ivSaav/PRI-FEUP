@@ -1,3 +1,4 @@
-data/imdb_final.csv
+data/imdb_final.*
 img/*.png
 docs/report_pri.tex
+solrdata/

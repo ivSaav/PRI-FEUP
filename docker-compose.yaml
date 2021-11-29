@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  solr:
+    image: solr:8.10
+    container_name: pri_proj
+    ports:
+     - "8983:8983"
+    volumes:
+      - "./solrdata:/var/solr"
+volumes:
+  solrdata:

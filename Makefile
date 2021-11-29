@@ -23,7 +23,7 @@ setup:
 	
 run:
 # Merging "imdb.csv" with "imdb_all_plots.csv" by id and title
-	${PYTHON} merge_data.py ;
+	${PYTHON} ./py_scripts/merge_data.py ;
 # ----- Cleaning up of data -----
 # The ouput of marge_data.py is taken and the following operations are executed:
 # - droping duplicate entries
@@ -33,9 +33,9 @@ run:
 # - removing plots which were too extensive
 # - removing rows with NaN values in key attributes
 # At the end all information is stored in "imdb_final.csv"
-	${PYTHON} processing.py ; 
+	${PYTHON} ./py_scripts/processing.py ; 
 # Generates images with plots, charts and tables that better describe the dataset
-	${PYTHON} analysis.py
+	${PYTHON} ./py_scripts/analysis.py
 
 # Removing generated files
 clean:
