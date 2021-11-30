@@ -55,9 +55,9 @@ docker exec pri_proj bin/solr delete -c $core_name ;
 # creating core without populating
 ./create_core.sh -c $core_name -p 0;
 
-if [ -n $xml_conf ];
+if [ -n "$xml_conf" ];
 then
-   echo "Copying config file to $xml_conf"
+   echo "[!] Copying config file to solrdata/data/$core_name/conf/$xml_conf"
    cp $xml_conf solrdata/data/$core_name/conf/$xml_conf
 fi
 
