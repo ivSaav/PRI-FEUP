@@ -27,19 +27,21 @@ Help()
 core_name="netflix"
 in_file="data/imdb_final.json"
 schema=0
-
+xml_conf=""
 
 ############################################################
 # Process the input options. Add options as needed.        #
 ############################################################
 # Get the options
-while getopts ":h:s:" option; do
+while getopts ":h:s:x:" option; do
    case $option in
       h) # display Help
          Help
          exit;;
       s)
          schema=$OPTARG;;
+      x)
+         xml_conf=$OPTARG;;
      \?) # Invalid option
          echo "Error: Invalid option"
          Help
@@ -52,6 +54,12 @@ docker exec pri_proj bin/solr delete -c $core_name ;
 
 # creating core without populating
 ./create_core.sh -c $core_name -p 0;
+
+if [ -n $xml_conf ];
+then
+   echo "Copying config file to $xml_conf"
+   cp $xml_conf solrdata/data/$core_name/conf/$xml_conf
+fi
 
 # load schema
 echo ""

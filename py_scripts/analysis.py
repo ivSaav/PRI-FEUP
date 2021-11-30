@@ -193,11 +193,13 @@ def data_analysis():
     
     plot_size(df)
     
-    print(df['kind'].value_counts())
     # plt.savefig('kind_counts')
 
     # top 100 programs
-    top_shows(df, 25, 'movie')
+    genre_1D = to_1D(df['genre'])
+    # genre_1D = genre_1D.to_frame(name='genre')
+    for genre in genre_1D.unique():
+        print("<value>" + genre + "</value>")
 
     density_plot(df, 'rating', 'Rating', lower=1, upper=10)
     year_counts(df, 'year')
