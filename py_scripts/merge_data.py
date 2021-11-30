@@ -24,7 +24,8 @@ def data_merging():
 
 
     out_path = Path('./data/imdb_final.csv')
-    df.to_csv(out_path, index=False, index_label='id', encoding='utf-8') # save final version
+    # df.to_csv(out_path, index=False, index_label='id', encoding='utf-8', ) # save final version
+    df.to_pickle(out_path)
 
 
 if __name__ == '__main__':

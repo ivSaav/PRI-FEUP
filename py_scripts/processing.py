@@ -43,10 +43,9 @@ def data_processing():
 
     # sleep(1)
 
-    df = pd.read_csv(Path('./data/imdb_final.csv'), encoding='utf-8')   # imdb data
+    # df = pd.read_csv(Path('./data/imdb_final.csv'), encoding='utf-8')   # imdb data
     
-    print(df['plot'].head(10))
-    
+    df = pd.read_pickle(Path('./data/imdb_final.csv'))    
 
     # removing duplicate entries from dataset
     df = df.drop_duplicates(subset=['title', 'year', 'kind', 'genre', 'rating'])
