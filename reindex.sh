@@ -53,13 +53,11 @@ docker exec pri_proj bin/solr delete -c $core_name ;
 # creating core without populating
 ./create_core.sh -c $core_name -p 0;
 
-if (( $schema ))
-then
-    # load schema
-    echo ""
-    echo "[!] Loading schema from ${schema}"
-    curl -X POST -H "Content-type:application/json" --data-binary @${schema}  "http://localhost:8983/solr/${core}/schema"
-fi
+# load schema
+echo ""
+echo "[!] Loading schema from ${schema}"
+curl -X POST -H "Content-type:application/json" --data-binary @${schema}  "http://localhost:8983/solr/${core_name}/schema"
+
 
 # repopulating core
 echo ""

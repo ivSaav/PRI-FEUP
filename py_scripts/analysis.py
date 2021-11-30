@@ -193,7 +193,7 @@ def data_analysis():
     
     plot_size(df)
     
-    # df['kind'].value_counts().plot.bar()
+    print(df['kind'].value_counts())
     # plt.savefig('kind_counts')
 
     # top 100 programs

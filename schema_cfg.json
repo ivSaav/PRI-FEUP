@@ -1,32 +1,17 @@
 {
 	"add-field-type": [
         {
-            "name":"courseTitle",
-            "class":"solr.TextField",
-            "indexAnalyzer":{
-                "tokenizer":{
-                    "class":"solr.StandardTokenizerFactory"
-                },
-                "filters":[
-                    {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
-                    {"class":"solr.LowerCaseFilterFactory"}
-                ]
-            },
-            "queryAnalyzer":{
-                "tokenizer":{
-                    "class":"solr.StandardTokenizerFactory"
-                },
-                "filters":[
-                    {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
-                    {"class":"solr.LowerCaseFilterFactory"}
-                ]
-            }
+            "name":"kindEnum",
+            "class":"solr.EnumFieldType",
+            "enumsConfig":"enumsConfig.xml",
+            "enumName":"kind",
+            "docValues":true
         }
     ],
     "add-field": [
         {
-            "name": "title",
-            "type": "courseTitle",
+            "name": "kind",
+            "type": "kindEnum",
             "indexed": true
         }
     ]
