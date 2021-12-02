@@ -2,19 +2,19 @@
 
 set +v
 
-############################################################
-# Help                                                     #
-############################################################
 Help()
 {
    # Display Help
    echo
-   echo "Syntax: reindex [-h|c|s]"
+   echo "Syntax: load_conf [-h|c|s|x]"
    echo "options:"
    echo "h     help."
-   echo "s     schema file (json)."
+   echo "c     core name."
+   echo "s     schema config file."
+   echo "x     xml to be copied to conf dir"
    echo
 }
+
 
 ############################################################
 ############################################################
@@ -22,42 +22,44 @@ Help()
 ############################################################
 ############################################################
 
+argc=$#
+
+if (( argc < 1 )) 
+then
+    Help
+    exit 1
+fi
+
 # Set variables
 core_name="netflix"
-in_file="data/imdb_final.json"
 schema=""
-xml_conf=""
+xml_file=""
 
 ############################################################
 # Process the input options. Add options as needed.        #
 ############################################################
 # Get the options
-while getopts ":h:s:x:" option; do
+while getopts ":h:c:s:x:p:" option; do
    case $option in
-      h) # display Help
+      h)
          Help
          exit;;
-      s)
+      c) # core name
+         core_name=$OPTARG;;
+      s) # input file
          schema=$OPTARG;;
       x)
-         xml_conf=$OPTARG;;
+         xml_file=$OPTARG;;
      \?) # Invalid option
          echo "Error: Invalid option"
-         Help
          exit;;
    esac
 done
 
-echo "[!] Deleting previous core"
-docker exec pri_proj bin/solr delete -c $core_name ;
-
-# creating core without populating
-./create_core.sh -c $core_name -p 0;
-
-if [ -n "$xml_conf" ];
+if [ -n "$xml_file" ];
 then
-   echo "[!] Copying config file to solrdata/data/$core_name/conf/$xml_conf"
-   cp $xml_conf solrdata/data/$core_name/conf/$xml_conf
+   echo "[!] Copying $xml_file file to solrdata/data/$core_name/conf/$xml_file"
+   cp $xml_file solrdata/data/${core_name}/conf/
 fi
 
 # load schema
@@ -67,11 +69,3 @@ then
    echo "[!] Loading schema from ${schema}"
    curl -X POST -H "Content-type:application/json" --data-binary @${schema}  "http://localhost:8983/solr/${core_name}/schema"
 fi
-
-# repopulating core
-echo ""
-echo "[!] Populating $core_name with $in_file"
-curl -X POST -H "Content-type:application/json" --data-binary @${in_file}  "http://localhost:8983/solr/${core_name}/update?commit=true"
-
-
-echo "Done."
