@@ -9,6 +9,7 @@ schema_folder="schema_conf"
 cmdarr=(
     "schema_cast.json"
     "schema_enums.json -x $schema_folder/enumsConfig.xml"
+    "schema_numeric.json"
 )
 
 # reset core
