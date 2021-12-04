@@ -1,0 +1,10 @@
+{
+    "add-initparams": {
+        "name": "def_params",
+        "path": "/select,/browse",
+        "defaults": {
+            "df": "title",
+            "q.op": "OR"
+        }
+    }
+}

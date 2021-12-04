@@ -32,24 +32,27 @@ fi
 
 # Set variables
 core_name="netflix"
-schema=""
+conf_file=""
 xml_file=""
+api="schema"
 
 ############################################################
 # Process the input options. Add options as needed.        #
 ############################################################
 # Get the options
-while getopts ":h:c:s:x:p:" option; do
+while getopts ":h:c:f:x:a:" option; do
    case $option in
       h)
          Help
          exit;;
       c) # core name
          core_name=$OPTARG;;
-      s) # input file
-         schema=$OPTARG;;
+      f) # input file
+         conf_file=$OPTARG;;
       x)
          xml_file=$OPTARG;;
+      a)
+         api=$OPTARG;;
      \?) # Invalid option
          echo "Error: Invalid option"
          exit;;
@@ -62,10 +65,10 @@ then
    cp $xml_file solrdata/data/${core_name}/conf/
 fi
 
-# load schema
-if [ -n "$schema" ];
+# load config
+if [ -n "$conf_file" ];
 then
    echo ""
-   echo "[!] Loading schema from ${schema}"
-   curl -X POST -H "Content-type:application/json" --data-binary @${schema}  "http://localhost:8983/solr/${core_name}/schema"
+   echo "[!] Loading config from ${conf_file}"
+   curl -X POST -H "Content-type:application/json" --data-binary @${conf_file}  "http://localhost:8983/solr/${core_name}/${api}"
 fi

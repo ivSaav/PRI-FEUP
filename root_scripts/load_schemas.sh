@@ -2,13 +2,13 @@
 
 set +v
 
-schema_folder="schema_conf"
+conf_folder="schema_conf"
 
 # Add schema filename to this array
 # If the schema requires a xml config add -x <path/to/config.xml>
-cmdarr=(
+schema_arr=(
     "schema_cast.json"
-    "schema_enums.json -x $schema_folder/enumsConfig.xml"
+    "schema_enums.json -x $conf_folder/enumsConfig.xml"
     "schema_numeric.json"
 )
 
@@ -16,9 +16,13 @@ cmdarr=(
 ./root_scripts/delete.sh netflix
 ./root_scripts/create_core.sh netflix
 
-for cmd in "${cmdarr[@]}"
+# load init paramns config
+./root_scripts/load_conf.sh -f $conf_folder/init_params.json -a config
+
+# load schema configs
+for cmd in "${schema_arr[@]}"
 do
-    ./root_scripts/load_conf.sh -s $schema_folder/$cmd
+    ./root_scripts/load_conf.sh -f $conf_folder/$cmd
 done
 
 echo "Done."
