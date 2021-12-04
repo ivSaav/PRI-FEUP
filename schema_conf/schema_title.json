@@ -9,7 +9,9 @@
                 },
                 "filters":[
                     {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
-                    {"class":"solr.LowerCaseFilterFactory"}
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class":"solr.EnglishMinimalStemFilterFactory"},
+                    {"class":"solr.EdgeNGramFilterFactory", "minGramSize":"3", "maxGramSize":"6"}
                 ]
             },
             "queryAnalyzer":{
