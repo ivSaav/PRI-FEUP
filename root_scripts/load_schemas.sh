@@ -10,6 +10,11 @@ schema_arr=(
     "schema_cast.json"
     "schema_enums.json -x $conf_folder/enumsConfig.xml"
     "schema_numeric.json"
+    "schema_country.json"
+    "schema_language.json"
+    "schema_director.json"
+    "schema_writer.json"
+
 )
 
 # reset core
