@@ -12,6 +12,7 @@ schema_arr=(
     "schema_numeric.json"
     "schema_country_lang.json"
     "schema_title.json"
+    "schema_plot.json"
 )
 
 # reset core
