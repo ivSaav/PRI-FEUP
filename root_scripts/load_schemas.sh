@@ -2,12 +2,12 @@
 
 set +v
 
-conf_folder="schema_conf"
+conf_folder="solr_conf"
 
 # Add schema filename to this array
 # If the schema requires a xml config add -x <path/to/config.xml>
 schema_arr=(
-    "schema_member.json"
+    "schema_member.json -x $conf_folder/name_synonyms.txt"
     "schema_enums.json -x $conf_folder/enumsConfig.xml"
     "schema_numeric.json"
     "schema_country_lang.json"

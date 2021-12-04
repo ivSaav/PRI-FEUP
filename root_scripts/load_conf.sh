@@ -61,7 +61,7 @@ done
 
 if [ -n "$xml_file" ];
 then
-   echo "[!] Copying $xml_file file to solrdata/data/$core_name/conf/$xml_file"
+   echo "[!] Copying $xml_file file to solrdata/data/$core_name/conf/"
    cp $xml_file solrdata/data/${core_name}/conf/
 fi
 

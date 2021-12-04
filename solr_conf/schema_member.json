@@ -20,7 +20,7 @@
                 },
                 "filters": [
                     {"class": "solr.WordDelimiterGraphFilterFactory", "catenateWords":1, "stemEnglishPossessive":1},
-                    {"class": "solr.FlattenGraphFilterFactory"},
+                    {"class": "solr.SynonymGraphFilterFactory", "synonyms":"name_synonyms.txt", "ignoreCase":true},
                     {"class": "solr.LowerCaseFilterFactory"},
                     {"class": "solr.ASCIIFoldingFilterFactory"}
                 ]

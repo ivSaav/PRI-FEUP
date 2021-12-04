@@ -207,6 +207,8 @@ def data_analysis():
     plot_size(df)
 
     pie_plot(df)
+    
+    print(df['rating'].describe())
 
 
 
