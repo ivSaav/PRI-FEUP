@@ -62,3 +62,9 @@ def fetch_plots(col_name='plot', m_info='plot'):
 
 if __name__ == "__main__":
     fetch_plots(col_name='plot', m_info='plot')
+    
+    # ia = IMDb()
+    # res = ia.search_person("Dwayne Johnson")
+    # print(res[0].personID)
+    # res = ia.get_person(res[0].personID)
+    # print(res.data)
