@@ -1,7 +1,7 @@
 {
 	"add-field-type": [
         {
-            "name": "composerType",
+            "name": "languageType",
             "class": "solr.TextField",
             "indexAnalyzer": {
                 "tokenizer": {
@@ -29,8 +29,15 @@
     ],
     "add-field": [
         {
-            "name": "composer",
-            "type": "composerType",
+            "name": "country",
+            "type": "string",
+            "indexed": false,
+            "stored": true,
+            "multiValued": true
+        },
+        {
+            "name": "language",
+            "type": "languageType",
             "indexed": true,
             "multiValued": true
         }

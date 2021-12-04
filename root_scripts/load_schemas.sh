@@ -7,14 +7,11 @@ conf_folder="schema_conf"
 # Add schema filename to this array
 # If the schema requires a xml config add -x <path/to/config.xml>
 schema_arr=(
-    "schema_cast.json"
+    "schema_member.json"
     "schema_enums.json -x $conf_folder/enumsConfig.xml"
     "schema_numeric.json"
-    "schema_country.json"
-    "schema_language.json"
-    "schema_director.json"
-    "schema_writer.json"
-
+    "schema_country_lang.json"
+    "schema_title.json"
 )
 
 # reset core

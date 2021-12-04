@@ -4,6 +4,12 @@
             "name":"netflixTitle",
             "class":"solr.TextField",
             "indexAnalyzer":{
+                "charFilter":{
+                    "class": "solr.PatternReplaceCharFilterFactory",
+                    "pattern": "(\\w+)(:)",
+                    "replacement": ""
+
+                },
                 "tokenizer":{
                     "class":"solr.StandardTokenizerFactory"
                 },

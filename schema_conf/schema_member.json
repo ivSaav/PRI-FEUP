@@ -1,7 +1,7 @@
 {
 	"add-field-type": [
         {
-            "name": "writerType",
+            "name": "memberType",
             "class": "solr.TextField",
             "indexAnalyzer": {
                 "tokenizer": {
@@ -29,8 +29,26 @@
     ],
     "add-field": [
         {
+            "name": "cast",
+            "type": "memberType",
+            "indexed": true,
+            "multiValued": true
+        },
+        {
+            "name": "composer",
+            "type": "memberType",
+            "indexed": true,
+            "multiValued": true
+        },
+        {
+            "name": "director",
+            "type": "memberType",
+            "indexed": true,
+            "multiValued": true
+        },
+        {
             "name": "writer",
-            "type": "writerType",
+            "type": "memberType",
             "indexed": true,
             "multiValued": true
         }
