@@ -12,7 +12,7 @@ schema_arr=(
     "schema_numeric.json"
     "schema_country_lang.json"
     "schema_title.json"
-    "schema_plot.json"
+    "schema_plot.json -x $conf_folder/stopwords_en.txt"
 )
 
 # reset core
