@@ -1,0 +1,38 @@
+{
+	"add-field-type": [
+        {
+            "name": "writerType",
+            "class": "solr.TextField",
+            "indexAnalyzer": {
+                "tokenizer": {
+                    "class": "solr.WhitespaceTokenizerFactory"
+                },
+                "filters": [
+                    {"class": "solr.WordDelimiterGraphFilterFactory", "catenateWords":1, "stemEnglishPossessive":1},
+                    {"class": "solr.FlattenGraphFilterFactory"},
+                    {"class": "solr.LowerCaseFilterFactory"},
+                    {"class": "solr.ASCIIFoldingFilterFactory"}
+                ]
+            },
+            "queryAnalyzer": {
+                "tokenizer": {
+                    "class": "solr.WhitespaceTokenizerFactory"
+                },
+                "filters": [
+                    {"class": "solr.WordDelimiterGraphFilterFactory", "catenateWords":1, "stemEnglishPossessive":1},
+                    {"class": "solr.FlattenGraphFilterFactory"},
+                    {"class": "solr.LowerCaseFilterFactory"},
+                    {"class": "solr.ASCIIFoldingFilterFactory"}
+                ]
+            }
+        }
+    ],
+    "add-field": [
+        {
+            "name": "writer",
+            "type": "writerType",
+            "indexed": true,
+            "multiValued": true
+        }
+    ]
+}
