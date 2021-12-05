@@ -31,7 +31,7 @@ def csv_to_json(csvFilePath, jsonFilePath):
         #convert each csv row into python dict
         for row in csvReader: 
             #add this python dict to json array
-            handle_list_fields(row, ['genre', 'country', 'language', 'cast', 'writer', 'plot', 'director', 'composer'])
+            handle_list_fields(row, ['genre', 'country', 'language', 'cast', 'writer', 'plot',  'director', 'composer'])
             jsonArray.append(row)
   
     #convert python jsonArray to JSON String and write to file
@@ -77,9 +77,18 @@ def data_processing():
     
     df['year'] = df['year'].apply(int)
     df['vote'] = df['vote'].apply(int)
+    
+    
+    # print(df['plot'].head())
+
+    # df['brief']= df['plot'].apply(extract_brief)
+    # df['brief'] = df['plot'].apply(lambda x : x[0])
+    # df['plot'] = df['plot'].apply(lambda x : x[1] if len(x) > 1 else "")
+
+    print(df.head())
 
     df.to_csv(Path('./data/imdb_final.csv'), index=False, index_label='id', encoding='utf-8') # save final version
-    # df.to_json(Path('./data/imdb_final.json'), orient='records')
+    # # df.to_json(Path('./data/imdb_final.json'), orient='records')
     
     csv_to_json(Path('./data/imdb_final.csv'), Path('./data/imdb_final.json'))
 

@@ -180,6 +180,7 @@ def general_analysis(df, field):
 def data_analysis():
 
     df = pd.read_csv(Path('./data/imdb_final.csv'))   # imdb data
+    df['plot'] = df['plot'].astype(str)
 
 
     genre_1D = genre_hist(df)

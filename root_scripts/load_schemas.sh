@@ -11,7 +11,7 @@ schema_arr=(
     "schema_enums.json -x $conf_folder/enumsConfig.xml"
     "schema_numeric.json"
     "schema_country_lang.json"
-    "schema_title.json"
+    "schema_title.json -x $conf_folder/stopwords_simple.txt"
     "schema_plot.json -x $conf_folder/stopwords_en.txt"
 )
 
