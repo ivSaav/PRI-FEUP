@@ -8,7 +8,8 @@ conf_folder="solr_conf"
 # If the schema requires a xml config add -x <path/to/config.xml>
 schema_arr=(
     "schema_member.json -x $conf_folder/name_synonyms.txt"
-    "schema_enums.json -x $conf_folder/enumsConfig.xml"
+    #"schema_enums.json -x $conf_folder/enumsConfig.xml"
+    "schema_genre_type.json"
     "schema_numeric.json"
     "schema_country_lang.json"
     "schema_title.json -x $conf_folder/stopwords_simple.txt"

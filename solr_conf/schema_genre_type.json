@@ -1,0 +1,40 @@
+{
+	"add-field-type": [
+        {
+            "name": "genreType",
+            "class": "solr.TextField",
+            "analyzer": {
+                "tokenizer": {
+                    "class": "solr.LowerCaseTokenizerFactory"
+                }
+            }
+        },
+        {
+            "name": "kindType",
+            "class": "solr.TextField",
+            "analyzer": {
+                "tokenizer": {
+                    "class": "solr.WhitespaceTokenizerFactory"
+                },
+                "filters": [
+                    {"class": "solr.LowerCaseFilterFactory"}
+                ]
+            }
+        }
+    ],
+    "add-field": [
+        {
+            "name": "genre",
+            "type": "genreType",
+            "indexed": true,
+            "multiValued": true
+        },
+        {
+            "name": "kind",
+            "type": "kindType",
+            "indexed": false,
+            "stored": true,
+            "multiValued": true
+        }
+    ]
+}

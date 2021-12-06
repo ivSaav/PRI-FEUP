@@ -8,35 +8,40 @@ import pysolr
 # solrpy examples: https://github.com/django-haystack/pysolr
 
 # Create a client instance. The timeout and authentication options are not required.
-solr = pysolr.Solr('http://localhost:8983/solr/courses', always_commit=False)
+solr = pysolr.Solr('http://localhost:8983/solr/netflix', always_commit=False)
 
 # Do a health check.
 solr.ping()
 
 # edit according to query needs
-QRELS_FILE = "system_qrels.txt"
-QNAME = "simple"
+QNAME = "wars"
+query = 'documentary wars'
 
-relevant = list(map(lambda el: el.strip(), open(QRELS_FILE).readlines()))
 
-res_sys1 = solr.search('informaçao dados^2', **{
+res_sys1 = solr.search(query, **{
     'q.OP': 'OR',
-    'defType': 'edismax',
-    'qf': 'title^2 objectives learning_outcomes'
+    'defType': 'dismax',
+    'qf': 'title year genre rating language cast writer composer plot'
 }).docs
 
-res_sys2 = solr.search('informaçao dados^2', **{
+res_sys2 = solr.search(query, **{
     'q.OP': 'OR',
     'defType': 'edismax',
-    'qf': 'title^2 objectives learning_outcomes'
+    'qf': 'title year genre rating language cast writer composer plot'
 }).docs
 
-res_sys3 = solr.search('informaçao dados^2', **{
+res_sys3 = solr.search(query, **{
     'q.OP': 'OR',
     'defType': 'edismax',
-    'qf': 'title^2 objectives learning_outcomes'
+    'qf': 'title year genre rating language cast writer composer plot'
 }).docs
 
+relevant = list(map(lambda el: el.strip(), open(f"{QNAME}_qrels.txt").readlines()))
+relevant = [x for x in relevant if x[0] != '#'] # remove commented lines
+
+
+for res in res_sys1:
+    print(res['id'])
 # The ``Results`` object stores total results found, by default the top
 # ten most relevant results and any additional data like
 # facets/highlighting/spelling/etc.
@@ -60,6 +65,7 @@ def ap(results, relevant):
         ]) / idx 
         for idx in range(1, len(results))
     ]
+    print(precision_values)
     return sum(precision_values)/len(precision_values)
 
 @metric
