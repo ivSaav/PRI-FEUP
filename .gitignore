@@ -2,3 +2,4 @@ data/imdb_final.*
 img/*.png
 docs/report_pri.tex
 solrdata/
+docs/eval_reports/*
