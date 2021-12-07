@@ -14,14 +14,13 @@ solr = pysolr.Solr('http://localhost:8983/solr/netflix', always_commit=False)
 solr.ping()
 
 # edit according to query needs
-QNAME = "wars"
-query = 'documentary wars'
+QNAME = "system"
+query = 'star AND wars AND \"sci-fi\"'
 
 
 res_sys1 = solr.search(query, **{
-    'q.OP': 'OR',
-    'defType': 'dismax',
-    'qf': 'title year genre rating language cast writer composer plot'
+    'defType': 'edismax',
+    'qf': 'title genre kind language cast writer composer plot'
 }).docs
 
 res_sys2 = solr.search(query, **{
