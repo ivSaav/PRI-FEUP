@@ -1,4 +1,4 @@
-# drama AND action AND movies
+# drama AND action AND movie
 # fq - year:[2000 TO *]
 5493
 735
