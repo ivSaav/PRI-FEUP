@@ -19,10 +19,10 @@ import requests
 #     'fl': 'id'
 # }
 
-QNAME = "ww2_no_docs"
+QNAME = "drama_action_movies"
 
-QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20kind%20plot&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller%20)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
-QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20kind%20plot&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller%20)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
+QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B2000%20TO%20*%5D&indent=true&q.op=AND&q=drama%20AND%20action%20AND%20movie&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
+QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B2000%20TO%20*%5D&indent=true&q.op=AND&q=drama%20AND%20action%20AND%20movie&qf=title%5E1.2%20genre%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E1.5&rows=100"
 
 res_sys1 = requests.get(QUERY_URL1).json()['response']['docs']
 res_sys2 = requests.get(QUERY_URL2).json()['response']['docs']
@@ -52,7 +52,6 @@ def ap(results, relevant):
         ]) / idx 
         for idx in range(1, len(results))
     ]
-    print(precision_values)
     return sum(precision_values)/len(precision_values)
 
 @metric
