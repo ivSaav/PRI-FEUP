@@ -1,53 +1,40 @@
-# If on Python 2.X
-# from __future__ import print_function
-
 import pandas as pd
 from pathlib import Path
-import pysolr
 
-# solrpy examples: https://github.com/django-haystack/pysolr
+import requests
 
-# Create a client instance. The timeout and authentication options are not required.
-solr = pysolr.Solr('http://localhost:8983/solr/netflix', always_commit=False)
+# { OPTIONS SYSTEM 1
+#     'q.OP' : 'AND',
+#     'defType': 'edismax',
+#     'qf': 'title genre kind language cast writer composer plot',
+#     'rows': 100,
+#     'fl': 'id'
+# }
 
-# Do a health check.
-solr.ping()
+# { OPTIONS SYSTEM 1
+#     'q.OP' : 'AND',
+#     'defType': 'edismax',
+#     'qf': 'title genre kind language cast writer composer plot',
+#     'rows': 100,
+#     'fl': 'id'
+# }
 
-# edit according to query needs
-QNAME = "wars"
-query = 'documentary wars'
+QNAME = "ww2_no_docs"
 
+QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20kind%20plot&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller%20)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
+QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20kind%20plot&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller%20)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
 
-res_sys1 = solr.search(query, **{
-    'q.OP': 'OR',
-    'defType': 'dismax',
-    'qf': 'title year genre rating language cast writer composer plot'
-}).docs
+res_sys1 = requests.get(QUERY_URL1).json()['response']['docs']
+res_sys2 = requests.get(QUERY_URL2).json()['response']['docs']
 
-res_sys2 = solr.search(query, **{
-    'q.OP': 'OR',
-    'defType': 'edismax',
-    'qf': 'title year genre rating language cast writer composer plot'
-}).docs
-
-res_sys3 = solr.search(query, **{
-    'q.OP': 'OR',
-    'defType': 'edismax',
-    'qf': 'title year genre rating language cast writer composer plot'
-}).docs
-
-relevant = list(map(lambda el: el.strip(), open(f"{QNAME}_qrels.txt").readlines()))
-relevant = [x for x in relevant if x[0] != '#'] # remove commented lines
-
-
-for res in res_sys1:
-    print(res['id'])
-# The ``Results`` object stores total results found, by default the top
-# ten most relevant results and any additional data like
-# facets/highlighting/spelling/etc.
 print("[SYS1] Saw {0} result(s).".format(len(res_sys1)))
 print("[SYS2] Saw {0} result(s).".format(len(res_sys2)))
-print("[SYS3] Saw {0} result(s).".format(len(res_sys3)))
+
+# for res in res_sys1:
+#     print(res['id'])
+    
+relevant = list(map(lambda el: el.strip(), open(Path(f"./qrels/{QNAME}.txt")).readlines()))
+relevant = [x for x in relevant if x[0] != '#'] # ignore commented lines
 
 # METRICS TABLE
 # Define custom decorator to automatically calculate metric based on key
@@ -83,9 +70,9 @@ evaluation_metrics = {
 }
 
 # Calculate all metrics and export results as LaTeX table
-df = pd.DataFrame([['Metric','SYS1', 'SYS2', 'SYS3']] +
+df = pd.DataFrame([['Metric','SYS1', 'SYS2']] +
     [
-        [evaluation_metrics[m], calculate_metric(m, res_sys1, relevant),  calculate_metric(m, res_sys2, relevant), calculate_metric(m, res_sys3, relevant)]
+        [evaluation_metrics[m], calculate_metric(m, res_sys1, relevant),  calculate_metric(m, res_sys2, relevant)]
         for m in evaluation_metrics
     ]
 )

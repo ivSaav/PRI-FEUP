@@ -1,29 +1,17 @@
 {
 	"add-field-type": [
         {
-            "name": "languageType",
+            "name": "langType",
             "class": "solr.TextField",
-            "indexAnalyzer": {
-                "tokenizer": {
-                    "class": "solr.WhitespaceTokenizerFactory"
-                },
-                "filters": [
-                    {"class": "solr.WordDelimiterGraphFilterFactory", "catenateWords":1, "stemEnglishPossessive":1},
-                    {"class": "solr.FlattenGraphFilterFactory"},
-                    {"class": "solr.LowerCaseFilterFactory"},
-                    {"class": "solr.ASCIIFoldingFilterFactory"}
-                ]
+            "indexAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.LowerCaseTokenizerFactory"
+                }
             },
-            "queryAnalyzer": {
-                "tokenizer": {
-                    "class": "solr.WhitespaceTokenizerFactory"
-                },
-                "filters": [
-                    {"class": "solr.WordDelimiterGraphFilterFactory", "catenateWords":1, "stemEnglishPossessive":1},
-                    {"class": "solr.FlattenGraphFilterFactory"},
-                    {"class": "solr.LowerCaseFilterFactory"},
-                    {"class": "solr.ASCIIFoldingFilterFactory"}
-                ]
+            "queryAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.LowerCaseTokenizerFactory"
+                }
             }
         }
     ],
@@ -37,7 +25,7 @@
         },
         {
             "name": "language",
-            "type": "languageType",
+            "type": "langType",
             "indexed": true,
             "multiValued": true
         }

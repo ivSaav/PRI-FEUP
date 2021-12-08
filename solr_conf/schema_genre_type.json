@@ -6,7 +6,11 @@
             "analyzer": {
                 "tokenizer": {
                     "class": "solr.LowerCaseTokenizerFactory"
-                }
+                },
+                "filters":[
+                    {"class":"solr.ASCIIFoldingFilterFactory"},
+                    {"class": "solr.EnglishMinimalStemFilterFactory"}
+                ]
             }
         },
         {
@@ -16,8 +20,10 @@
                 "tokenizer": {
                     "class": "solr.WhitespaceTokenizerFactory"
                 },
-                "filters": [
-                    {"class": "solr.LowerCaseFilterFactory"}
+                "filters":[
+                    {"class":"solr.ASCIIFoldingFilterFactory"},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class":"solr.NGramFilterFactory", "minGramSize":"5", "maxGramSize":"5"}
                 ]
             }
         }
@@ -32,8 +38,7 @@
         {
             "name": "kind",
             "type": "kindType",
-            "indexed": false,
-            "stored": true,
+            "indexed": true,
             "multiValued": true
         }
     ]

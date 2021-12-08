@@ -79,14 +79,32 @@ def year_counts(df, field):
     plt.close()
 
 def top_actors(df):
-    tmp = df.dropna(subset=['cast'])
+    actor_dict = {}
+    
+    tmp = df.dropna(subset=['cast']).copy()  # tmp['cast'] = tmp['cast']
     tmp['cast'] = tmp['cast'].apply(eval)
+    
 
-    print(type(tmp['cast'][0]))
+    # # print(type(tmp['cast'][0]))
     members = to_1D(tmp['cast']).value_counts()
+    # print(type(members))
+    
+    c = 0
+    for name, count in members.iteritems():
+        print(f"{name}\t\t{count}")
+        c += 1
+        if c >= 100:
+            break
 
     # print(members.head(50))
     # print(to_1D(df['cast']).value_counts())
+    # print(df['cast'])
+    # for row in tmp['cast']:
+    #     print(type(row))
+    #     for member in row:
+    #         actor_dict.setdefault(member, 0)
+    #         actor_dict[member] += 1
+    # print(actor_dict)
 
 
 def plot_size(df):
@@ -183,28 +201,28 @@ def data_analysis():
     df['plot'] = df['plot'].astype(str)
 
 
-    genre_1D = genre_hist(df)
-    general_analysis(df, 'cast')
-    general_analysis(df, 'director')
-    general_analysis(df, 'composer')
-    general_analysis(df, 'writer')
-    general_analysis(df, 'country')
-    general_analysis(df, 'language')
+    # genre_1D = genre_hist(df)
+    # general_analysis(df, 'cast')
+    # general_analysis(df, 'director')
+    # general_analysis(df, 'composer')
+    # general_analysis(df, 'writer')
+    # general_analysis(df, 'country')
+    # general_analysis(df, 'language')
     # plot_heatmap(df)    
     
-    plot_size(df)
+    # plot_size(df)
     
     # plt.savefig('kind_counts')
 
     # top 100 programs
-    top_shows(df, 100, 'movie')
+    # top_shows(df, 100, 'movie')
 
-    density_plot(df, 'rating', 'Rating', lower=1, upper=10)
-    year_counts(df, 'year')
-    # density_plot(df, 'year', 'Year', lower=1900, upper=2020)
+    # density_plot(df, 'rating', 'Rating', lower=1, upper=10)
+    # year_counts(df, 'year')
+    # # density_plot(df, 'year', 'Year', lower=1900, upper=2020)
 
     # runtime_comparison(df)
-    # top_actors(df)
+    top_actors(df)
     plot_size(df)
 
     pie_plot(df)
