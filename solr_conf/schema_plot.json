@@ -11,7 +11,6 @@
                     {"class": "solr.StopFilterFactory", "words":"stopwords_en.txt", "ignoreCase": true},
                     {"class":"solr.ASCIIFoldingFilterFactory"},
                     {"class":"solr.LowerCaseFilterFactory"},
-                    {"class":"solr.EnglishPossessiveFilterFactory"},
                     {"class": "solr.EnglishMinimalStemFilterFactory"},
                     {"class": "solr.KStemFilterFactory"},
                     {"class": "solr.RemoveDuplicatesTokenFilterFactory"}
@@ -25,7 +24,6 @@
                     {"class": "solr.SuggestStopFilterFactory", "words":"stopwords_en.txt", "ignoreCase": true},
                     {"class":"solr.ASCIIFoldingFilterFactory"},
                     {"class":"solr.LowerCaseFilterFactory"},
-                    {"class":"solr.EnglishPossessiveFilterFactory"},
                     {"class": "solr.EnglishMinimalStemFilterFactory"},
                     {"class": "solr.KStemFilterFactory"},
                     {"class": "solr.RemoveDuplicatesTokenFilterFactory"}
