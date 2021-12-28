@@ -2,7 +2,7 @@
 # Ivo Saavedra, José Ferrão, Pedro Simões
 
 # Python version
-PYTHON = python3
+PYTHON = python
 
 # Available functions
 .PHONY = help run setup clean

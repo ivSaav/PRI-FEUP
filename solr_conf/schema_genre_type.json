@@ -16,14 +16,23 @@
         {
             "name": "kindType",
             "class": "solr.TextField",
-            "analyzer": {
+            "indexAnalizer": {
                 "tokenizer": {
-                    "class": "solr.WhitespaceTokenizerFactory"
+                    "class": "solr.StandardTokenizerFactory"
+                },
+                "filters":[
+                    {"class":"solr.ASCIIFoldingFilterFactory"},
+                    {"class":"solr.LowerCaseFilterFactory"}
+                ]
+            },
+            "queryAnalyzer": {
+                "tokenizer": {
+                    "class": "solr.StandardTokenizerFactory"
                 },
                 "filters":[
                     {"class":"solr.ASCIIFoldingFilterFactory"},
                     {"class":"solr.LowerCaseFilterFactory"},
-                    {"class":"solr.NGramFilterFactory", "minGramSize":"5", "maxGramSize":"5"}
+                    {"class": "solr.SynonymGraphFilterFactory", "synonyms":"kind_synonyms.txt", "ignoreCase":true}
                 ]
             }
         }
@@ -38,8 +47,7 @@
         {
             "name": "kind",
             "type": "kindType",
-            "indexed": true,
-            "multiValued": true
+            "indexed": true
         }
     ]
 }

@@ -18,10 +18,9 @@
     "add-field": [
         {
             "name": "country",
-            "type": "string",
+            "type": "strings",
             "indexed": false,
-            "stored": true,
-            "multiValued": true
+            "stored": true
         },
         {
             "name": "language",

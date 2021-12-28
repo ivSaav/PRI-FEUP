@@ -1,7 +1,7 @@
 {
 	"add-field-type": [
         {
-            "name":"briefType",
+            "name":"plotType",
             "class":"solr.TextField",
             "indexAnalyzer":{
                 "tokenizer":{
@@ -34,7 +34,7 @@
     "add-field": [
         {
             "name": "plot",
-            "type": "briefType",
+            "type": "plotType",
             "indexed": true,
             "multiValued":true
         }
