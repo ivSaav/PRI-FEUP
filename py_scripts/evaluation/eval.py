@@ -50,46 +50,15 @@ from sklearn.metrics import PrecisionRecallDisplay
 # QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=(%22tv%20series%22%20OR%20%22tv%20mini%20series%22%20OR%20%22series%22)%20AND%20Comedy%20AND%20English&qf=title%5E1.2%20genre%5E1.1%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E0.7&rows=100"
 
 
-#### star wars ambiguity search ####
-QNAME = "simple_sw"
-QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=Star%20Wars&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
-# QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot%20composer&indent=true&q.op=AND&q=Star%20Wars&qf=title%5E1.2%20genre%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E1.5&rows=50"
-QUERY_URL2 ="http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=Star%20Wars&qf=title%5E1.2%20genre%5E1.1%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E0.7&rows=100"
+# #### star wars ambiguity search ####
+# QNAME = "simple_sw"
+# QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=Star%20Wars&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
+# # QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot%20composer&indent=true&q.op=AND&q=Star%20Wars&qf=title%5E1.2%20genre%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E1.5&rows=50"
+# QUERY_URL2 ="http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=Star%20Wars&qf=title%5E1.2%20genre%5E1.1%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E0.7&rows=100"
 
-res_sys1 = requests.get(QUERY_URL1).json()['response']['docs']
-res_sys2 = requests.get(QUERY_URL2).json()['response']['docs']
 
-print("[SYS1] Saw {0} result(s).".format(len(res_sys1)))
-print("[SYS2] Saw {0} result(s).".format(len(res_sys2)))
 
-# for res in res_sys1:
-#     print(res['id'])
-    
-relevant = list(map(lambda el: el.strip(), open(Path(f"./qrels/{QNAME}.txt")).readlines()))
-relevant = [x for x in relevant if x[0] != '#'] # ignore commented lines
 
-# METRICS TABLE
-# Define custom decorator to automatically calculate metric based on key
-metrics = {}
-metric = lambda f: metrics.setdefault(f.__name__, f)
-
-@metric
-def ap(results, relevant):
-    """Average Precision"""
-    precision_values = [
-        len([
-            doc 
-            for doc in results[:idx]
-            if doc['id'] in relevant
-        ]) / idx 
-        for idx in range(1, len(results))
-    ]
-    return sum(precision_values)/len(precision_values)
-
-@metric
-def p10(results, relevant, n=10):
-    """Precision at N"""
-    return len([doc for doc in results[:n] if doc['id'] in relevant])/n
 
 def convertToLaTeX(df, alignment="|c"):
     """
@@ -114,13 +83,11 @@ def convertToLaTeX(df, alignment="|c"):
     output.write("\\end{tabular}\n\\end{table}")
     return output.getvalue()
 
-def ranking(res1, res2, relevant, n=10):
-    # df = pd.DataFrame([['Rank','SYS1', 'SYS2']] +
-    #     [
-    #         [[i for i in range(n+1)], ["X" if doc['id'] in relevant else " " for doc in res1[:n] ],  ["X" if doc['id'] in relevant else " " for doc in res2[:n]]]
-    #     ]
-    # )
-    
+#################################################################################
+#################################################################################
+# EVALUATION METRICS
+
+def ranking(qname, res1, res2, relevant, n=10):
     df = pd.DataFrame(
         {
             'Rank' : [i for i in range(1, n+1)],
@@ -129,39 +96,57 @@ def ranking(res1, res2, relevant, n=10):
         }
     )
     df = df.set_index('Rank')
-    with open(Path(f'../docs/eval_reports/{QNAME}_rank.tex'),'w') as tf:
+    with open(Path(f'./reports/{qname}_rank.tex'),'w') as tf:
         # tf.write(df.to_latex(index=False))
         tf.write(convertToLaTeX(df))
     print(df)
+    
+
+# METRICS TABLE
+# Define custom decorator to automatically calculate metric based on key
+metrics = {}
+metric = lambda f: metrics.setdefault(f.__name__, f)
+
+@metric
+def ap(results, relevant):
+    """Average Precision"""
+    precision_values = [
+        len([
+            doc 
+            for doc in results[:idx]
+            if doc['id'] in relevant
+        ]) / idx 
+        for idx in range(1, len(results))
+    ]
+    return sum(precision_values)/len(precision_values)
+
+@metric
+def p10(results, relevant, n=10):
+    """Precision at N"""
+    return len([doc for doc in results[:n] if doc['id'] in relevant])/n
 
 def calculate_metric(key, results, relevant):
     return metrics[key](results, relevant)
 
-# Define metrics to be calculated
-evaluation_metrics = {
-    'ap': 'AP',
-    'p10': 'P@10'
-}
 
-# Calculate all metrics and export results as LaTeX table
-# df = pd.DataFrame([['Metric','SYS1', 'SYS2']] +
-#     [
-#         [evaluation_metrics[m], calculate_metric(m, res_sys1, relevant),  calculate_metric(m, res_sys2, relevant)]
-#         for m in evaluation_metrics
-#     ]
-# )
+def calculate_metrics(qname, res1, res2, relevant):
+    # Define metrics to be calculated
+    evaluation_metrics = {
+        'ap': 'AP',
+        'p10': 'P@10'
+    }
 
-df = pd.DataFrame(
-        {
-            "Metric": [evaluation_metrics[m] for m in evaluation_metrics],
-            "SYS1" :  [calculate_metric(m, res_sys1, relevant) for m in evaluation_metrics],
-            "SYS2" :  [calculate_metric(m, res_sys2, relevant) for m in evaluation_metrics]
-        }
-    )
-df.set_index('Metric', inplace=True)
+    df = pd.DataFrame(
+            {
+                "Metric": [evaluation_metrics[m] for m in evaluation_metrics],
+                "SYS1" :  [calculate_metric(m, res1, relevant) for m in evaluation_metrics],
+                "SYS2" :  [calculate_metric(m, res2, relevant) for m in evaluation_metrics]
+            }
+        )
+    df.set_index('Metric', inplace=True)
 
-with open(Path(f'../docs/eval_reports/{QNAME}_results.tex'),'w') as tf:
-    tf.write(convertToLaTeX(df))
+    with open(Path(f'./reports/{qname}_results.tex'),'w') as tf:
+        tf.write(convertToLaTeX(df))
 
 #################################################################################
 #################################################################################
@@ -187,22 +172,37 @@ def plot_precision_recal_graph(results, relevant, avp=None, **kwargs):
         for idx, _ in enumerate(results, start=1)
     ]
 
-    # print("precision")
-    # print(precision_values)
-    
-    # print("recal")
-    # print(recall_values)
     # disp = PrecisionRecallDisplay([precision_recall_match.get(r) for r in recall_values], recall_values)
     disp = PrecisionRecallDisplay(precision=precision_values, recall=recall_values, average_precision=avp)
     disp.plot(**kwargs)
     # plt.savefig('precision_recall.pdf')
 
-_, ax = plt.subplots(figsize=(8, 8))
-  
-plot_precision_recal_graph(res_sys1, relevant,  name="sys1", color="red", ax=ax)
-plot_precision_recal_graph(res_sys2, relevant, name="sys2",  color="orange", ax=ax)
 
-ax.set_ylim([0.3, 1.01])
-plt.savefig(Path(f'../docs/eval_reports/{QNAME}_curve.png'), bbox_inches='tight')
+def evaluate(qname, url1, url2):
+    res_sys1 = requests.get(url1).json()['response']['docs']
+    res_sys2 = requests.get(url2).json()['response']['docs']
 
-ranking(res_sys1, res_sys2, relevant, 10)
+    print("[SYS1] Saw {0} result(s).".format(len(res_sys1)))
+    print("[SYS2] Saw {0} result(s).".format(len(res_sys2)))
+        
+    relevant = list(map(lambda el: el.strip(), open(Path(f"./qrels/{qname}.txt")).readlines()))
+    relevant = [x for x in relevant if x[0] != '#'] # ignore commented lines
+    
+    calculate_metrics(qname, res_sys1, res_sys2, relevant)
+    
+    _, ax = plt.subplots(figsize=(8, 8))
+    plot_precision_recal_graph(res_sys1, relevant,  name="sys1", color="red", ax=ax)
+    plot_precision_recal_graph(res_sys2, relevant, name="sys2",  color="orange", ax=ax)
+    ax.set_ylim([0.3, 1.01])
+    plt.savefig(Path(f'./reports/{qname}_curve.png'), bbox_inches='tight')
+
+    ranking(qname, res_sys1, res_sys2, relevant, 10)
+    
+if __name__ == '__main__':
+    evaluate("simple_sw", 
+             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=Star%20Wars&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+             "http://localhost:8983/solr/netflix/select?debugQuery=false&defType=edismax&fl=id%20title%20kind%20plot%20score&indent=true&q.op=AND&q=star%20wars&qf=title%5E2%20genre%5E2%20kind%5E2%20language%20cast%20writer%20composer%20plot%5E1.5&rows=100&stopwords=false")
+    
+    evaluate("ww2_no_docs", 
+             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%5E3%20genre%5E2%20kind%5E2%20language%20cast%20writer%20composer%20plot%5E1.5&rows=100")
