@@ -3,3 +3,4 @@ img/*.png
 docs/report_pri.tex
 solrdata/
 py_scripts/evaluation/reports/*
+.vscode/

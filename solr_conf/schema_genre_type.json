@@ -3,7 +3,7 @@
         {
             "name": "genreType",
             "class": "solr.TextField",
-            "analyzer": {
+            "indexAnalyzer": {
                 "tokenizer": {
                     "class": "solr.LowerCaseTokenizerFactory"
                 },
@@ -11,28 +11,14 @@
                     {"class":"solr.ASCIIFoldingFilterFactory"},
                     {"class": "solr.EnglishMinimalStemFilterFactory"}
                 ]
-            }
-        },
-        {
-            "name": "kindType",
-            "class": "solr.TextField",
-            "indexAnalizer": {
-                "tokenizer": {
-                    "class": "solr.StandardTokenizerFactory"
-                },
-                "filters":[
-                    {"class":"solr.ASCIIFoldingFilterFactory"},
-                    {"class":"solr.LowerCaseFilterFactory"}
-                ]
             },
-            "queryAnalyzer": {
+            "queryAnalizer": {
                 "tokenizer": {
-                    "class": "solr.StandardTokenizerFactory"
+                    "class": "solr.LowerCaseTokenizerFactory"
                 },
                 "filters":[
                     {"class":"solr.ASCIIFoldingFilterFactory"},
-                    {"class":"solr.LowerCaseFilterFactory"},
-                    {"class": "solr.SynonymGraphFilterFactory", "synonyms":"kind_synonyms.txt", "ignoreCase":true}
+                    {"class": "solr.EnglishMinimalStemFilterFactory"}
                 ]
             }
         }
@@ -43,11 +29,6 @@
             "type": "genreType",
             "indexed": true,
             "multiValued": true
-        },
-        {
-            "name": "kind",
-            "type": "kindType",
-            "indexed": true
         }
     ]
 }
