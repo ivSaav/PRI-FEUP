@@ -20,9 +20,9 @@
                 },
                 "filters":[
                     {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
+                    {"class": "solr.SynonymGraphFilterFactory", "synonyms":"dims_synonyms.txt", "ignoreCase":true},
                     {"class":"solr.LowerCaseFilterFactory"},
                     {"class":"solr.EnglishMinimalStemFilterFactory"}
-        
                 ]
             }
         }

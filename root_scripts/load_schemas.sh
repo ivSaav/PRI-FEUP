@@ -13,7 +13,7 @@ schema_arr=(
     "schema_kind.json -x $conf_folder/kind_synonyms.txt"
     "schema_numeric.json"
     "schema_country_lang.json"
-    "schema_title.json -x $conf_folder/stopwords_simple.txt"
+    "schema_title.json -x $conf_folder/dims_synonyms.txt"
     "schema_plot.json -x $conf_folder/stopwords_en.txt"
 )
 

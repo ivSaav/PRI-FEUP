@@ -25,38 +25,6 @@ from sklearn.metrics import PrecisionRecallDisplay
 # }
 
 
-#### WW2 no documentaries ####
-# QNAME = "ww2_no_docs"
-# QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
-# # QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20genre%20plot&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%5E1.2%20genre%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E1.5&rows=100"
-# QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%5E1.2%20genre%5E1.1%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E0.7&rows=100"
-
-#### family programs done by voice actors ####
-# QNAME = "voice_actors_family"
-# QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20plot&indent=true&q.op=AND&q=(%22Frank%20Welker%22%20OR%20%22Kirk%20Thornton%22%20OR%20%22Wendee%20Lee%22%20OR%20%22Jeff%20Bennett%22)%20AND%20Family&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
-# # QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20genre%20plot&indent=true&q.op=AND&q=(%22Frank%20Welker%22%20OR%20%22Kirk%20Thornton%22%20OR%20%22Wendee%20Lee%22%20OR%20%22Jeff%20Bennett%22)%20AND%20Family&qf=title%5E1.2%20genre%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E1.5&rows=100"
-# QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(%22Frank%20Welker%22%20OR%20%22Kirk%20Thornton%22%20OR%20%22Wendee%20Lee%22%20OR%20%22Jeff%20Bennett%22)%20AND%20Family&qf=title%5E1.2%20genre%5E1.1%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E0.7&rows=100"
-
-##### romantic comedies in spanish or french #####
-# QNAME = "comedy_romantic_fr_spa"
-# QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20plot&indent=true&q.op=AND&q=(spanish%20OR%20french)%20AND%20(comedy%20AND%20romance)&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
-# # QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20genre%20plot&indent=true&q.op=AND&q=(spanish%20OR%20french)%20AND%20(comedy%20AND%20romance)&qf=title%5E1.2%20genre%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E1.5&rows=100"
-# QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(spanish%20OR%20french)%20AND%20(comedy%20AND%20romance)&qf=title%5E1.2%20genre%5E1.1%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E0.7&rows=100"
-
-##### comedy series in english #####
-# QNAME = "series_comedy_english_to1995"
-# QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20plot&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=(%22tv%20series%22%20OR%20%22tv%20mini%20series%22%20OR%20%22series%22)%20AND%20Comedy%20AND%20English&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
-# # QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20genre%20plot&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=(%22tv%20series%22%20OR%20%22tv%20mini%20series%22%20OR%20%22series%22)%20AND%20Comedy%20AND%20English&qf=title%5E1.2%20genre%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E1.5&rows=100"
-# QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=(%22tv%20series%22%20OR%20%22tv%20mini%20series%22%20OR%20%22series%22)%20AND%20Comedy%20AND%20English&qf=title%5E1.2%20genre%5E1.1%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E0.7&rows=100"
-
-
-# #### star wars ambiguity search ####
-# QNAME = "simple_sw"
-# QUERY_URL1 = "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=Star%20Wars&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100"
-# # QUERY_URL2 = "http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot%20composer&indent=true&q.op=AND&q=Star%20Wars&qf=title%5E1.2%20genre%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E1.5&rows=50"
-# QUERY_URL2 ="http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=Star%20Wars&qf=title%5E1.2%20genre%5E1.1%20kind%5E0.8%20language%20cast%20writer%20composer%20plot%5E0.7&rows=100"
-
-
 def print_header(name):
     print('\n#######################')
     print(name)
