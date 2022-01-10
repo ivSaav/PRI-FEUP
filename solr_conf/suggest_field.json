@@ -1,0 +1,36 @@
+{
+    "add-field-type": [
+        {
+            "name": "suggestType",
+            "class": "solr.TextField",
+            "indexAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters": [
+                    {"class":"solr.LowerCaseFilterFactory"}
+                ]
+            },
+            "queryAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters": [
+                    {"class":"solr.LowerCaseFilterFactory"}
+                ]
+            }
+        }
+    ],
+    "add-field":
+    {
+        "name": "suggest",
+        "type": "suggestType",
+        "indexed": false,
+        "stored": true
+    },
+    "add-copy-field":
+    {
+        "source": "title",
+        "dest": "suggest"
+    }
+}

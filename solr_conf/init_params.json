@@ -15,10 +15,9 @@
                 "name": "mySuggester",
                 "lookupImpl": "FuzzyLookupFactory",
                 "dictionaryImpl": "DocumentDictionaryFactory",
-                "field": "title",
+                "field": "suggest",
                 "weightField": "vote",
-                "suggestAnalyzerFieldType": "string",
-                "buildOnStartup": "true"
+                "suggestAnalyzerFieldType": "string"
             }
         ]
     },

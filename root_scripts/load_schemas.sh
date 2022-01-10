@@ -15,6 +15,7 @@ schema_arr=(
     "schema_country_lang.json"
     "schema_title.json -x $conf_folder/dims_synonyms.txt"
     "schema_plot.json -x $conf_folder/stopwords_en.txt"
+    "suggest_field.json"
 )
 
 # reset core
