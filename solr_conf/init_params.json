@@ -6,5 +6,30 @@
             "df": "title",
             "q.op": "OR"
         }
+    },
+    "add-searchcomponent": {
+        "name": "suggest",
+        "class": "solr.SuggestComponent",
+        "suggester": [
+            {
+                "name": "mySuggester",
+                "lookupImpl": "FuzzyLookupFactory",
+                "dictionaryImpl": "DocumentDictionaryFactory",
+                "field": "title",
+                "weightField": "vote",
+                "suggestAnalyzerFieldType": "string",
+                "buildOnStartup": "true"
+            }
+        ]
+    },
+    "add-requesthandler":{
+        "name": "/suggest",
+        "class": "solr.SearchHandler",
+        "startup": "lazy",
+        "defaults":{
+            "suggest": true,
+            "suggest.count": 10
+        },
+        "components":["suggest"]
     }
 }
