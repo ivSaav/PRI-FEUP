@@ -8,6 +8,7 @@
                     "class":"solr.StandardTokenizerFactory"
                 },
                 "filters": [
+                    {"class": "solr.StopFilterFactory", "words":"stopwords_en.txt", "ignoreCase": true},
                     {"class":"solr.LowerCaseFilterFactory"}
                 ]
             },
@@ -16,6 +17,7 @@
                     "class":"solr.StandardTokenizerFactory"
                 },
                 "filters": [
+                    {"class": "solr.SuggestStopFilterFactory", "words":"stopwords_en.txt", "ignoreCase": true},
                     {"class":"solr.LowerCaseFilterFactory"}
                 ]
             }

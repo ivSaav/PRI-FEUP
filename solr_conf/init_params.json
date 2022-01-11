@@ -13,9 +13,10 @@
         "suggester": [
             {
                 "name": "mySuggester",
-                "lookupImpl": "FuzzyLookupFactory",
+                "lookupImpl": "FreeTextLookupFactory",
                 "dictionaryImpl": "DocumentDictionaryFactory",
                 "field": "suggest",
+                "suggestFreeTextAnalyzerFieldType": "suggestType",
                 "weightField": "vote",
                 "suggestAnalyzerFieldType": "string"
             }

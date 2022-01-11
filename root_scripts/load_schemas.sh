@@ -22,13 +22,15 @@ schema_arr=(
 ./root_scripts/delete.sh netflix
 ./root_scripts/create_core.sh netflix
 
-# load init paramns config
-./root_scripts/load_conf.sh -f $conf_folder/init_params.json -a config
+
 
 # load schema configs
 for cmd in "${schema_arr[@]}"
 do
     ./root_scripts/load_conf.sh -f $conf_folder/$cmd
 done
+
+# load init paramns config
+./root_scripts/load_conf.sh -f $conf_folder/init_params.json -a config
 
 echo "Done."
