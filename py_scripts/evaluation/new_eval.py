@@ -58,24 +58,7 @@ def convertToLaTeX(df, alignment="|c"):
 #################################################################################
 #################################################################################
 # EVALUATION METRICS
-
-def ranking(qname, res1, res2, relevant, n=10):
-    df = pd.DataFrame(
-        {
-            'Rank' : [i for i in range(1, n+1)],
-            'SYS1' : ["X" if doc['id'] in relevant else "" for doc in res1[:n] ],
-            'SYS2':  ["X" if doc['id'] in relevant else "" for doc in res2[:n] ]
-        }
-    )
-    df = df.set_index('Rank')
-    with open(Path(f'./reports/{qname}_rank.tex'),'w') as tf:
-        # tf.write(df.to_latex(index=False))
-        tf.write(convertToLaTeX(df))
-    print()
-    print(df)
-
-    return df
-    
+  
 
 # METRICS TABLE
 # Define custom decorator to automatically calculate metric based on key
@@ -87,12 +70,18 @@ def avp(ranks, n=10):
     res = list()
     for i in range(1, n+1):
         tmp = ranks[:i]
-        sum = np.sum(tmp)
-        res.append(round(sum/i, 2))
+        s = np.sum(tmp)
+        res.append(round(s/i, 3))
         
     # extract only the positive ones
     p_values = [res[x] for x in range(n) if ranks[x] == 1]
     return round(np.sum(p_values)/len(p_values), 2), res
+
+@metric
+def rr(ranks, n=10):
+    if 1 in ranks:
+        return 1/(ranks.index(1)+1)
+    return 0
     
 
 @metric
@@ -116,23 +105,41 @@ def interp_pr(p_values, r_values):
     return res
 
 
+def ranking(qname, res1, res2, relevant, n=10):
+    df = pd.DataFrame(
+        {
+            'Rank' : [i for i in range(1, n+1)],
+            'SYS1' : ["X" if doc['id'] in relevant else "" for doc in res1[:n] ],
+            'SYS2':  ["X" if doc['id'] in relevant else "" for doc in res2[:n] ]
+        }
+    )
+    df = df.set_index('Rank')
+    with open(Path(f'./reports/{qname}_rank.tex'),'w') as tf:
+        # tf.write(df.to_latex(index=False))
+        tf.write(convertToLaTeX(df))
+    print()
+    print(df)
+
+    return df
+
 def calculate_metrics(qname, ranks):
     # Define metrics to be calculated
     evaluation_metrics = {
         'avp': 'AvP',
         'p10' : 'P@10',
+        "rr" : "RR"
     }
     
     results = {}
     results["SYS1"] = calculate_system_metrics(qname, ranks["SYS1"])
     results["SYS2"] = calculate_system_metrics(qname, ranks["SYS2"])
-    results["SYS3"] = calculate_system_metrics(qname, ranks["SYS3"])
+    # results["SYS3"] = calculate_system_metrics(qname, ranks["SYS3"])
     
     metric_dict =  {
         "Metric": [evaluation_metrics[m] for m in evaluation_metrics],
         "SYS1" :  [results["SYS1"][m] for m in evaluation_metrics],
         "SYS2" :  [results["SYS2"][m] for m in evaluation_metrics],
-        "SYS3" :  [results["SYS3"][m] for m in evaluation_metrics]
+        # "SYS3" :  [results["SYS3"][m] for m in evaluation_metrics]
     }
 
     df = pd.DataFrame(metric_dict)
@@ -148,10 +155,14 @@ def calculate_metrics(qname, ranks):
     return results
 
 def calculate_system_metrics(qname, ranks):
+    
+    ranks = [1 if x == "X" else 0 for x in ranks]
+    print(ranks)
     results = {}
     results['avp'], results['p_values'] = avp(ranks)
     results['recall'], results['r_values'] = recall(ranks)
     results['p10'] = results['p_values'][-1]
+    results['rr'] = rr(ranks)
     return results
 
 #################################################################################
@@ -181,13 +192,17 @@ def evaluate(qname, url1, url2):
     
     ranks = ranking(qname, res_sys1, res_sys2, relevant, 10)
     
-    metrics = calculate_metrics(qname, ranks)
+    results = calculate_metrics(qname, ranks)
     
     _, ax = plt.subplots(figsize=(8, 8))
-    plot_precision_recal_graph(res_sys1, relevant,  name="sys1", color="red", ax=ax)
-    plot_precision_recal_graph(res_sys2, relevant, name="sys2",  color="orange", ax=ax)
+    plot_precision_recal_graph(results["SYS1"]["p_values"], results["SYS1"]["r_values"], ax=ax, color="red")
+    plot_precision_recal_graph(results["SYS2"]["p_values"], results["SYS2"]["r_values"], ax=ax, color="orange")
+    # plot_precision_recal_graph(res_sys1, relevant,  name="sys1", color="red", ax=ax)
+    # plot_precision_recal_graph(res_sys2, relevant, name="sys2",  color="orange", ax=ax)
     ax.set_ylim([0.3, 1.01])
     plt.savefig(Path(f'./reports/{qname}_curve.png'), bbox_inches='tight')
+    
+    return results
 
     
     
@@ -201,8 +216,8 @@ if __name__ == '__main__':
     # CAST = 0.8
     
     
-    dic = {"Rank" : [i for i in range(1, 10+1)], "SYS1" : [1,1,1,0,0,1,0,0,0,0], "SYS2": [1,0,0,1,0,0,1,0,1,1], "SYS3" : [1,1,1,1,1,0,0,0,1,0]}
-    df = pd.DataFrame(dic)
+    # dic = {"Rank" : [i for i in range(1, 10+1)], "SYS1" : [1,1,1,0,0,1,0,0,0,0], "SYS2": [1,0,0,1,0,0,1,0,1,1], "SYS3" : [1,1,1,1,1,0,0,0,1,0]}
+    # df = pd.DataFrame(dic)
     
     # ap, p_values = avp(df["SYS1"], 10)
     # recall = recall(df["SYS1"], 10)
@@ -212,11 +227,55 @@ if __name__ == '__main__':
     # print("Recall: ", recall)
     # print("AvP", ap, p_values)
     # print("Interp PR ", pr)
-    results = calculate_metrics("test", dic)
-    print(results)
-    _, ax = plt.subplots(figsize=(8, 8))
-    plot_precision_recal_graph(results["SYS1"]["p_values"], results["SYS1"]["r_values"], ax=ax, color="red")
-    plot_precision_recal_graph(results["SYS2"]["p_values"], results["SYS2"]["r_values"], ax=ax, color="orange")
-    plot_precision_recal_graph(results["SYS3"]["p_values"], results["SYS3"]["r_values"], ax=ax, color="blue")
+    # results = calculate_metrics("test", dic)
+    # print(results)
+    # _, ax = plt.subplots(figsize=(8, 8))
+    # plot_precision_recal_graph(results["SYS1"]["p_values"], results["SYS1"]["r_values"], ax=ax, color="red")
+    # plot_precision_recal_graph(results["SYS2"]["p_values"], results["SYS2"]["r_values"], ax=ax, color="orange")
+    # plot_precision_recal_graph(results["SYS3"]["p_values"], results["SYS3"]["r_values"], ax=ax, color="blue")
     
-    plt.show()
+    # plt.show()
+    
+    
+    # Boosts
+    TITLE = 3
+    GENRE = 2
+    KIND = 2
+    PLOT = 0.7
+    CAST = 0.8
+    
+    # Star Wars
+    print_header('Star Wars')
+    evaluate("simple_sw", 
+             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=Star%20Wars&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+             f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot&indent=true&q.op=AND&q=Star%20Wars&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
+    
+    # World War II series or movies (no documentaries)
+    print_header("World War II")
+    evaluate("ww2_no_docs", 
+             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+             f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
+
+    # Romantic comedies in spanish or french
+    print_header("Romantic Comedy")
+    evaluate("comedy_romantic_fr_spa", 
+             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(spanish%20OR%20french)%20AND%20(comedy%20AND%20romance)&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+             f"http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(spanish%20OR%20french)%20AND%20(comedy%20AND%20romance)&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
+    
+    # Drama and Action movies
+    print_header("Drama and Action Movies")
+    evaluate("drama_action_movies", 
+             "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B2000%20TO%20*%5D&indent=true&q.op=AND&q=drama%20AND%20action%20AND%20movie&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+             f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot&fq=year%3A%5B2000%20TO%20*%5D&indent=true&q.op=AND&q=drama%20AND%20action%20AND%20movie&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
+    
+    # English Comedies up to (1995)
+    print_header("English Comedies")
+    evaluate("series_comedy_english_to1995", 
+             "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=comedy%20AND%20english%20AND%20tv%20show&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+             f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot%20kind&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=comedy%20AND%20english%20AND%20tv%20show&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
+    
+    # Voice Actors 
+    print_header("Voice Actors")
+    evaluate("voice_actors_family", 
+             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(%22Frank%20Welker%22%20OR%20%22Kirk%20Thornton%22%20OR%20%22Wendee%20Lee%22%20OR%20%22Jeff%20Bennett%22)%20AND%20Family&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+             f"http://localhost:8983/solr/netflix/select?debugQuery=true&defType=edismax&fl=id%20title%20genre%20plot%20kind&indent=true&q.op=AND&q=(%22Frank%20Welker%22%20OR%20%22Kirk%20Thornton%22%20OR%20%22Wendee%20Lee%22%20OR%20%22Jeff%20Bennett%22)%20AND%20Family&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E0.7&rows=100")
