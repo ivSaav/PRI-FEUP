@@ -93,11 +93,11 @@ def calc_dcg(relevance_values):
         if i > 1:
             dcg_res[i-1] += dcg_res[i-2]
     
-    dcg_res = [round(x, DECIMAL_CASE) for x in dcg_res]
     return dcg_res
 
 @metric
 def dcg(qname, ranks, res_sys, n=10, results={}):
+    print()
     rel_file = open("./relevance/" + qname + ".txt")
     
     rels = rel_file.readlines()    
@@ -125,9 +125,12 @@ def dcg(qname, ranks, res_sys, n=10, results={}):
     
     # calculate IDCG
     # ideal ordering
-    retrieved_relevances.sort(reverse=True)
-    print("OPTIMAL ORDER ", retrieved_relevances)
-    idcg_res = calc_dcg(retrieved_relevances)
+    ideal_relevances = [x for x in rels_dict.values()]
+    ideal_relevances.sort(reverse=True)
+    ideal_relevances = ideal_relevances[:10]
+    # retrieved_relevances.sort(reverse=True)
+    print("OPTIMAL ORDER ", ideal_relevances)
+    idcg_res = calc_dcg(ideal_relevances)
     print("IDEAL DCG ", idcg_res)
     
     results["ndcg"] = dcg_res[-1]/idcg_res[-1]
