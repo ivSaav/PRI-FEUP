@@ -31,5 +31,52 @@
             "suggest.count": 10
         },
         "components":["suggest"]
+    },
+    "update-searchcomponent": {
+        "name": "spellcheck",
+        "class": "solr.SpellCheckComponent",
+        "queryAnalyzerFieldType": "suggestType",
+        "spellchecker": [
+            {
+                "name": "default",
+                "field": "suggest",
+                "classname": "solr.DirectSolrSpellChecker",
+                "distanceMeasure": "internal",
+                "accuracy": 0.1,
+                "maxEdits": 2,
+                "minPrefix": 1,
+                "maxInspections": 5,
+                "minQueryLenght": 3,
+                "maxQueryFrequency": 0.01
+            },
+            {
+                "name": "wordbreak",
+                "classname": "solr.WordBreakSolrSpellChecker",
+                "field": "suggest",
+                "combineWords": true,
+                "breakWords": false,
+                "maxChanges": 10
+            }
+        ] 
+    },
+    "update-requesthandler": 
+    {
+        "name": "/spell",
+        "class": "solr.SearchHandler",
+        "defaults": {
+            "df": "suggest",
+            "spellcheck.dictionary": ["default", "wordbreak"],
+            "spellcheck": "on",
+            "spellcheck.alternativeTermCount": 5,
+            "spellcheck.maxResultsForSuggest": 5,
+            "spellcheck.maxCollationTries": 40,
+            "spellcheck.extendedResults": true,
+            "spellcheck.count": 10,
+            "spellcheck.collate": true,
+            "spellcheck.collateExtendedResults": true
+        },
+        "last-components": [
+            "spellcheck"
+        ]
     }
 }

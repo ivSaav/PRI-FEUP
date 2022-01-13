@@ -27,8 +27,7 @@
     {
         "name": "suggest",
         "type": "suggestType",
-        "indexed": false,
-        "stored": true
+        "indexed": true
     },
     "add-copy-field":
     {

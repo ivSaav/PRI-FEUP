@@ -110,7 +110,8 @@ def ranking(qname, res1, res2, relevant, n=10):
         {
             'Rank' : [i for i in range(1, n+1)],
             'SYS1' : ["X" if doc['id'] in relevant else "" for doc in res1[:n] ],
-            'SYS2':  ["X" if doc['id'] in relevant else "" for doc in res2[:n] ]
+            'SYS2':  ["X" if doc['id'] in relevant else "" for doc in res2[:n] ],
+            # 'SYS3':  ["X" if doc['id'] in relevant else "" for doc in res3[:n] ]
         }
     )
     df = df.set_index('Rank')
@@ -180,23 +181,26 @@ def plot_precision_recal_graph(precision_values, recall_values, avp=None, **kwar
     # # plt.savefig('precision_recall.pdf')
 
 
-def evaluate(qname, url1, url2):
+def evaluate(qname, url1, url2, url3):
     res_sys1 = requests.get(url1).json()['response']['docs']
     res_sys2 = requests.get(url2).json()['response']['docs']
+    # res_sys3 = requests.get(url3).json()['response']['docs']
 
     print("[SYS1] Saw {0} result(s).".format(len(res_sys1)))
     print("[SYS2] Saw {0} result(s).".format(len(res_sys2)))
+    # print("[SYS3] Saw {0} result(s).".format(len(res_sys2)))
         
     relevant = list(map(lambda el: el.strip(), open(Path(f"./qrels/{qname}.txt")).readlines()))
     relevant = [x for x in relevant if x[0] != '#'] # ignore commented lines
     
-    ranks = ranking(qname, res_sys1, res_sys2, relevant, 10)
+    ranks = ranking(qname, res_sys1, res_sys2, res_sys3, relevant, 10)
     
     results = calculate_metrics(qname, ranks)
     
     _, ax = plt.subplots(figsize=(8, 8))
     plot_precision_recal_graph(results["SYS1"]["p_values"], results["SYS1"]["r_values"], ax=ax, color="red")
     plot_precision_recal_graph(results["SYS2"]["p_values"], results["SYS2"]["r_values"], ax=ax, color="orange")
+    # plot_precision_recal_graph(results["SYS3"]["p_values"], results["SYS3"]["r_values"], ax=ax, color="blue")
     # plot_precision_recal_graph(res_sys1, relevant,  name="sys1", color="red", ax=ax)
     # plot_precision_recal_graph(res_sys2, relevant, name="sys2",  color="orange", ax=ax)
     ax.set_ylim([0.3, 1.01])
@@ -207,36 +211,7 @@ def evaluate(qname, url1, url2):
     
     
 if __name__ == '__main__':
-    
-    # # Boosts
-    # TITLE = 3
-    # GENRE = 2
-    # KIND = 2
-    # PLOT = 0.7
-    # CAST = 0.8
-    
-    
-    # dic = {"Rank" : [i for i in range(1, 10+1)], "SYS1" : [1,1,1,0,0,1,0,0,0,0], "SYS2": [1,0,0,1,0,0,1,0,1,1], "SYS3" : [1,1,1,1,1,0,0,0,1,0]}
-    # df = pd.DataFrame(dic)
-    
-    # ap, p_values = avp(df["SYS1"], 10)
-    # recall = recall(df["SYS1"], 10)
-    
-    # pr = interp_pr(p_values, recall)
-    
-    # print("Recall: ", recall)
-    # print("AvP", ap, p_values)
-    # print("Interp PR ", pr)
-    # results = calculate_metrics("test", dic)
-    # print(results)
-    # _, ax = plt.subplots(figsize=(8, 8))
-    # plot_precision_recal_graph(results["SYS1"]["p_values"], results["SYS1"]["r_values"], ax=ax, color="red")
-    # plot_precision_recal_graph(results["SYS2"]["p_values"], results["SYS2"]["r_values"], ax=ax, color="orange")
-    # plot_precision_recal_graph(results["SYS3"]["p_values"], results["SYS3"]["r_values"], ax=ax, color="blue")
-    
-    # plt.show()
-    
-    
+
     # Boosts
     TITLE = 3
     GENRE = 2
@@ -252,30 +227,30 @@ if __name__ == '__main__':
     
     # World War II series or movies (no documentaries)
     print_header("World War II")
-    evaluate("ww2_no_docs", 
+    evaluate("ww2_no_docs",
              "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
              f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
 
-    # Romantic comedies in spanish or french
-    print_header("Romantic Comedy")
-    evaluate("comedy_romantic_fr_spa", 
-             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(spanish%20OR%20french)%20AND%20(comedy%20AND%20romance)&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
-             f"http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(spanish%20OR%20french)%20AND%20(comedy%20AND%20romance)&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
+    # # Romantic comedies in spanish or french
+    # print_header("Romantic Comedy")
+    # evaluate("comedy_romantic_fr_spa", 
+    #          "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(spanish%20OR%20french)%20AND%20(comedy%20AND%20romance)&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+    #          f"http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(spanish%20OR%20french)%20AND%20(comedy%20AND%20romance)&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
     
-    # Drama and Action movies
-    print_header("Drama and Action Movies")
-    evaluate("drama_action_movies", 
-             "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B2000%20TO%20*%5D&indent=true&q.op=AND&q=drama%20AND%20action%20AND%20movie&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
-             f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot&fq=year%3A%5B2000%20TO%20*%5D&indent=true&q.op=AND&q=drama%20AND%20action%20AND%20movie&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
+    # # Drama and Action movies
+    # print_header("Drama and Action Movies")
+    # evaluate("drama_action_movies", 
+    #          "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B2000%20TO%20*%5D&indent=true&q.op=AND&q=drama%20AND%20action%20AND%20movie&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+    #          f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot&fq=year%3A%5B2000%20TO%20*%5D&indent=true&q.op=AND&q=drama%20AND%20action%20AND%20movie&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
     
-    # English Comedies up to (1995)
-    print_header("English Comedies")
-    evaluate("series_comedy_english_to1995", 
-             "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=comedy%20AND%20english%20AND%20tv%20show&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
-             f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot%20kind&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=comedy%20AND%20english%20AND%20tv%20show&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
+    # # English Comedies up to (1995)
+    # print_header("English Comedies")
+    # evaluate("series_comedy_english_to1995", 
+    #          "http://localhost:8983/solr/netflix/select?defType=edismax&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=comedy%20AND%20english%20AND%20tv%20show&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+    #          f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot%20kind&fq=year%3A%5B*%20TO%201995%5D&indent=true&q.op=AND&q=comedy%20AND%20english%20AND%20tv%20show&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
     
-    # Voice Actors 
-    print_header("Voice Actors")
-    evaluate("voice_actors_family", 
-             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(%22Frank%20Welker%22%20OR%20%22Kirk%20Thornton%22%20OR%20%22Wendee%20Lee%22%20OR%20%22Jeff%20Bennett%22)%20AND%20Family&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
-             f"http://localhost:8983/solr/netflix/select?debugQuery=true&defType=edismax&fl=id%20title%20genre%20plot%20kind&indent=true&q.op=AND&q=(%22Frank%20Welker%22%20OR%20%22Kirk%20Thornton%22%20OR%20%22Wendee%20Lee%22%20OR%20%22Jeff%20Bennett%22)%20AND%20Family&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E0.7&rows=100")
+    # # Voice Actors 
+    # print_header("Voice Actors")
+    # evaluate("voice_actors_family", 
+    #          "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=(%22Frank%20Welker%22%20OR%20%22Kirk%20Thornton%22%20OR%20%22Wendee%20Lee%22%20OR%20%22Jeff%20Bennett%22)%20AND%20Family&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+    #          f"http://localhost:8983/solr/netflix/select?debugQuery=true&defType=edismax&fl=id%20title%20genre%20plot%20kind&indent=true&q.op=AND&q=(%22Frank%20Welker%22%20OR%20%22Kirk%20Thornton%22%20OR%20%22Wendee%20Lee%22%20OR%20%22Jeff%20Bennett%22)%20AND%20Family&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E0.7&rows=100")

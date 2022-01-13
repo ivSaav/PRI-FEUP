@@ -1,4 +1,8 @@
 #!/bin/bash
 
-./root_scripts/load_schemas.sh
-./root_scripts/index.sh
+
+# reset core
+./root_scripts/delete.sh netflix_base
+./root_scripts/create_core.sh netflix_base
+
+./root_scripts/index.sh -c netflix_base
