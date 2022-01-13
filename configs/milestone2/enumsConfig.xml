@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<enumsConfig>
+  <enum name="kind">
+    <value>movie</value>
+    <value>tv series</value>
+    <value>episode</value>
+    <value>tv mini series</value>
+  </enum>
+  <enum name="genre">
+    <value>Documentary</value>
+    <value>Animation</value>
+    <value>Family</value>
+    <value>Crime</value>
+    <value>Horror</value>
+    <value>Thriller</value>
+    <value>Action</value>
+    <value>Sci-Fi</value>
+    <value>Comedy</value>
+    <value>Drama</value>
+    <value>Fantasy</value>
+    <value>Mystery</value>
+    <value>Biography</value>
+    <value>Sport</value>
+    <value>Adventure</value>
+    <value>Musical</value>
+    <value>Romance</value>
+    <value>Music</value>
+    <value>Short</value>
+    <value>History</value>
+    <value>War</value>
+    <value>Western</value>
+    <value>Talk-Show</value>
+    <value>News</value>
+    <value>Game-Show</value>
+    <value>Reality-TV</value>
+    <value>Film-Noir</value>
+  </enum>
+</enumsConfig>

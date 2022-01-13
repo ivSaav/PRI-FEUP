@@ -1,0 +1,37 @@
+{
+    "add-field-type": [
+        {
+            "name": "suggestType",
+            "class": "solr.TextField",
+            "indexAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters": [
+                    {"class": "solr.StopFilterFactory", "words":"stopwords_en.txt", "ignoreCase": true},
+                    {"class":"solr.LowerCaseFilterFactory"}
+                ]
+            },
+            "queryAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters": [
+                    {"class": "solr.SuggestStopFilterFactory", "words":"stopwords_en.txt", "ignoreCase": true},
+                    {"class":"solr.LowerCaseFilterFactory"}
+                ]
+            }
+        }
+    ],
+    "add-field":
+    {
+        "name": "suggest",
+        "type": "suggestType",
+        "indexed": true
+    },
+    "add-copy-field":
+    {
+        "source": "title",
+        "dest": "suggest"
+    }
+}

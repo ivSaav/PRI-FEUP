@@ -1,0 +1,45 @@
+{
+	"add-field-type": [
+        {
+            "name": "genreType",
+            "class": "solr.TextField",
+            "analyzer": {
+                "tokenizer": {
+                    "class": "solr.LowerCaseTokenizerFactory"
+                },
+                "filters":[
+                    {"class":"solr.ASCIIFoldingFilterFactory"},
+                    {"class": "solr.EnglishMinimalStemFilterFactory"}
+                ]
+            }
+        },
+        {
+            "name": "kindType",
+            "class": "solr.TextField",
+            "analyzer": {
+                "tokenizer": {
+                    "class": "solr.WhitespaceTokenizerFactory"
+                },
+                "filters":[
+                    {"class":"solr.ASCIIFoldingFilterFactory"},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class":"solr.NGramFilterFactory", "minGramSize":"5", "maxGramSize":"5"}
+                ]
+            }
+        }
+    ],
+    "add-field": [
+        {
+            "name": "genre",
+            "type": "genreType",
+            "indexed": true,
+            "multiValued": true
+        },
+        {
+            "name": "kind",
+            "type": "kindType",
+            "indexed": true,
+            "multiValued": true
+        }
+    ]
+}

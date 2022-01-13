@@ -1,0 +1,42 @@
+{
+	"add-field-type": [
+        {
+            "name":"plotType",
+            "class":"solr.TextField",
+            "indexAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.ClassicTokenizerFactory"
+                },
+                "filters":[
+                    {"class": "solr.StopFilterFactory", "words":"stopwords_en.txt", "ignoreCase": true},
+                    {"class":"solr.ASCIIFoldingFilterFactory"},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class": "solr.EnglishMinimalStemFilterFactory"},
+                    {"class": "solr.KStemFilterFactory"},
+                    {"class": "solr.RemoveDuplicatesTokenFilterFactory"}
+                ]
+            },
+            "queryAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.ClassicTokenizerFactory"
+                },
+                "filters":[
+                    {"class": "solr.SuggestStopFilterFactory", "words":"stopwords_en.txt", "ignoreCase": true},
+                    {"class":"solr.ASCIIFoldingFilterFactory"},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class": "solr.EnglishMinimalStemFilterFactory"},
+                    {"class": "solr.KStemFilterFactory"},
+                    {"class": "solr.RemoveDuplicatesTokenFilterFactory"}
+                ]
+            }
+        }
+    ],
+    "add-field": [
+        {
+            "name": "plot",
+            "type": "plotType",
+            "indexed": true,
+            "multiValued":true
+        }
+    ]
+}

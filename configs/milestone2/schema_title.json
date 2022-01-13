@@ -1,0 +1,44 @@
+{
+	"add-field-type": [
+        {
+            "name":"netflixTitle",
+            "class":"solr.TextField",
+            "indexAnalyzer":{
+                "charFilter":{
+                    "class": "solr.PatternReplaceCharFilterFactory",
+                    "pattern": "(\\w+)(:)",
+                    "replacement": ""
+
+                },
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters":[
+                    {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class":"solr.EnglishMinimalStemFilterFactory"},
+                    {"class":"solr.EdgeNGramFilterFactory", "minGramSize":"3", "maxGramSize":"6"}
+                ]
+            },
+            "queryAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters":[
+                    {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class":"solr.EnglishMinimalStemFilterFactory"},
+                    {"class":"solr.EdgeNGramFilterFactory", "minGramSize":"3", "maxGramSize":"6"}
+        
+                ]
+            }
+        }
+    ],
+    "add-field": [
+        {
+            "name": "title",
+            "type": "netflixTitle",
+            "indexed": true
+        }
+    ]
+}

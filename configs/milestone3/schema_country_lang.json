@@ -1,0 +1,32 @@
+{
+	"add-field-type": [
+        {
+            "name": "langType",
+            "class": "solr.TextField",
+            "indexAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.LowerCaseTokenizerFactory"
+                }
+            },
+            "queryAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.LowerCaseTokenizerFactory"
+                }
+            }
+        }
+    ],
+    "add-field": [
+        {
+            "name": "country",
+            "type": "strings",
+            "indexed": false,
+            "stored": true
+        },
+        {
+            "name": "language",
+            "type": "langType",
+            "indexed": true,
+            "multiValued": true
+        }
+    ]
+}
