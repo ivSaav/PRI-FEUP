@@ -8,6 +8,7 @@ import math
 from pathlib import Path
 from sklearn.metrics import PrecisionRecallDisplay
 
+DECIMAL_CASE = 2
 
 # { OPTIONS SYSTEM 1
 #     'q.OP' : 'AND',
@@ -71,19 +72,69 @@ def avp(ranks, n=10):
     for i in range(1, n+1):
         tmp = ranks[:i]
         s = np.sum(tmp)
-        res.append(round(s/i, 3))
+        res.append(round(s/i, DECIMAL_CASE))
         
     # extract only the positive ones
     p_values = [res[x] for x in range(n) if ranks[x] == 1]
-    return round(np.sum(p_values)/len(p_values), 2), res
+    return round(np.sum(p_values)/len(p_values), DECIMAL_CASE), res
 
 @metric
 def rr(ranks, n=10):
     if 1 in ranks:
         return 1/(ranks.index(1)+1)
     return 0
-    
 
+def calc_dcg(relevance_values):
+    # calculate dcg@k
+    dcg_res = [0 for i in range(10)]
+    for i, rel in enumerate(relevance_values, 1):
+        dcg_res[i-1] = (math.pow(2, rel) - 1) / math.log2(i+1)
+        # dcg_res[i-1] = rel / math.log2(i+1)
+        if i > 1:
+            dcg_res[i-1] += dcg_res[i-2]
+    
+    dcg_res = [round(x, DECIMAL_CASE) for x in dcg_res]
+    return dcg_res
+
+@metric
+def dcg(qname, ranks, res_sys, n=10, results={}):
+    rel_file = open("./relevance/" + qname + ".txt")
+    
+    rels = rel_file.readlines()    
+    rels = [x for x in rels if x[0] != '#'] # ignore commented lines
+    rels_dict = {}
+    for rel in rels:
+        doc_id, score = rel.split(':')
+        rels_dict[doc_id] = int(score)
+        
+    rel_file.close()
+    
+    # get relevance values
+    retrieved_relevances = []
+    for doc in res_sys[:n]:
+        doc_id = doc["id"]
+        rels_dict.setdefault(doc_id, 0)
+        retrieved_relevances.append(rels_dict[doc_id])
+    
+    dcg_res = calc_dcg(retrieved_relevances)
+    
+    results['dcg'], results['dcg_values'] = dcg_res[-1], dcg_res
+    
+    print("RELEVANCE SCORES ", retrieved_relevances)
+    print("DCG_RES ", dcg_res)  
+    
+    # calculate IDCG
+    # ideal ordering
+    retrieved_relevances.sort(reverse=True)
+    print("OPTIMAL ORDER ", retrieved_relevances)
+    idcg_res = calc_dcg(retrieved_relevances)
+    print("IDEAL DCG ", idcg_res)
+    
+    results["ndcg"] = dcg_res[-1]/idcg_res[-1]
+    print("nDCG ", results["ndcg"])
+    results['idcg'], results['idcg_values'] = idcg_res[-1], idcg_res
+        
+    
 @metric
 def recall(ranks, n=10):
     res = list()
@@ -91,7 +142,7 @@ def recall(ranks, n=10):
     
     for i in range(1, n+1):
         tmp = ranks[:i]
-        res.append(round(np.sum(tmp)/total, 2))
+        res.append(round(np.sum(tmp)/total, DECIMAL_CASE))
     return -1, res
 
 def interp_pr(p_values, r_values):
@@ -105,15 +156,16 @@ def interp_pr(p_values, r_values):
     return res
 
 
-def ranking(qname, res1, res2, relevant, n=10):
-    df = pd.DataFrame(
-        {
-            'Rank' : [i for i in range(1, n+1)],
-            'SYS1' : ["X" if doc['id'] in relevant else "" for doc in res1[:n] ],
-            'SYS2':  ["X" if doc['id'] in relevant else "" for doc in res2[:n] ],
-            # 'SYS3':  ["X" if doc['id'] in relevant else "" for doc in res3[:n] ]
-        }
-    )
+def ranking(qname, sys_res_dict, relevant, n=10):
+    
+    rank_dict = {}
+    rank_dict['Rank'] = [i for i in range(1, n+1)]
+    
+    # calculate ranks for each system
+    for k,v in sys_res_dict.items():
+        rank_dict[k] = ["X" if doc['id'] in relevant else "" for doc in v[:n] ]
+    
+    df = pd.DataFrame(rank_dict)
     df = df.set_index('Rank')
     with open(Path(f'./reports/{qname}_rank.tex'),'w') as tf:
         # tf.write(df.to_latex(index=False))
@@ -123,25 +175,35 @@ def ranking(qname, res1, res2, relevant, n=10):
 
     return df
 
-def calculate_metrics(qname, ranks):
+def calculate_metrics(qname, ranks, res_sys_dict):
     # Define metrics to be calculated
     evaluation_metrics = {
         'avp': 'AvP',
         'p10' : 'P@10',
-        "rr" : "RR"
+        "rr" : "RR",
+        'dcg': 'DCG@10',
+        'idcg' : "IDCG@10",
+        'ndcg' : "nDCG@10"
     }
     
+    
     results = {}
-    results["SYS1"] = calculate_system_metrics(qname, ranks["SYS1"])
-    results["SYS2"] = calculate_system_metrics(qname, ranks["SYS2"])
+    for k,v in res_sys_dict.items():
+        results[k] = calculate_system_metrics(qname, ranks[k], v)
+    # results["SYS1"] = )
+    # results["SYS2"] = calculate_system_metrics(qname, ranks["SYS2"])
     # results["SYS3"] = calculate_system_metrics(qname, ranks["SYS3"])
     
     metric_dict =  {
         "Metric": [evaluation_metrics[m] for m in evaluation_metrics],
-        "SYS1" :  [results["SYS1"][m] for m in evaluation_metrics],
-        "SYS2" :  [results["SYS2"][m] for m in evaluation_metrics],
+        # "SYS1" :  [results["SYS1"][m] for m in evaluation_metrics],
+        # "SYS2" :  [results["SYS2"][m] for m in evaluation_metrics],
         # "SYS3" :  [results["SYS3"][m] for m in evaluation_metrics]
     }
+    
+    for k in results.keys():
+        metric_dict[k] = [results[k][m] for m in evaluation_metrics]
+        
 
     df = pd.DataFrame(metric_dict)
     df.set_index('Metric', inplace=True)
@@ -155,15 +217,15 @@ def calculate_metrics(qname, ranks):
     
     return results
 
-def calculate_system_metrics(qname, ranks):
+def calculate_system_metrics(qname, ranks, res_sys):
     
     ranks = [1 if x == "X" else 0 for x in ranks]
-    print(ranks)
     results = {}
     results['avp'], results['p_values'] = avp(ranks)
     results['recall'], results['r_values'] = recall(ranks)
     results['p10'] = results['p_values'][-1]
     results['rr'] = rr(ranks)
+    dcg(qname, ranks, res_sys, results=results)
     return results
 
 #################################################################################
@@ -181,10 +243,14 @@ def plot_precision_recal_graph(precision_values, recall_values, avp=None, **kwar
     # # plt.savefig('precision_recall.pdf')
 
 
-def evaluate(qname, url1, url2, url3):
+def evaluate(qname, url1, url2):
     res_sys1 = requests.get(url1).json()['response']['docs']
     res_sys2 = requests.get(url2).json()['response']['docs']
     # res_sys3 = requests.get(url3).json()['response']['docs']
+    
+    sys_res_dict = {}
+    sys_res_dict["SYS1"] = res_sys1
+    sys_res_dict["SYS2"] = res_sys2
 
     print("[SYS1] Saw {0} result(s).".format(len(res_sys1)))
     print("[SYS2] Saw {0} result(s).".format(len(res_sys2)))
@@ -193,9 +259,11 @@ def evaluate(qname, url1, url2, url3):
     relevant = list(map(lambda el: el.strip(), open(Path(f"./qrels/{qname}.txt")).readlines()))
     relevant = [x for x in relevant if x[0] != '#'] # ignore commented lines
     
-    ranks = ranking(qname, res_sys1, res_sys2, res_sys3, relevant, 10)
+    ranks = ranking(qname, sys_res_dict, relevant, 10)
     
-    results = calculate_metrics(qname, ranks)
+    # print(sys_res_dict)
+    
+    results = calculate_metrics(qname, ranks, sys_res_dict)
     
     _, ax = plt.subplots(figsize=(8, 8))
     plot_precision_recal_graph(results["SYS1"]["p_values"], results["SYS1"]["r_values"], ax=ax, color="red")
@@ -226,10 +294,10 @@ if __name__ == '__main__':
              f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot&indent=true&q.op=AND&q=Star%20Wars&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
     
     # World War II series or movies (no documentaries)
-    print_header("World War II")
-    evaluate("ww2_no_docs",
-             "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
-             f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
+    # print_header("World War II")
+    # evaluate("ww2_no_docs",
+    #          "http://localhost:8983/solr/netflix/select?defType=edismax&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%20genre%20kind%20language%20cast%20writer%20composer%20plot&rows=100", 
+    #          f"http://localhost:8983/solr/netflix/select?defType=edismax&fl=id%20title%20genre%20plot&indent=true&q.op=AND&q=%22World%20War%22%20(2%20OR%20II%20OR%20two)%20(action%20OR%20drama%20OR%20thriller)%20AND%20-documentary&qf=title%5E{TITLE}%20genre%5E{GENRE}%20kind%5E{KIND}%20language%20cast%5E{CAST}%20writer%20composer%20plot%5E{PLOT}&rows=100")
 
     # # Romantic comedies in spanish or french
     # print_header("Romantic Comedy")
