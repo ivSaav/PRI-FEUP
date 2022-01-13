@@ -1,2 +1,0 @@
-movies, film, motion picture => movie
-series, show, tv show, short series, mini series => tv mini series, tv series
